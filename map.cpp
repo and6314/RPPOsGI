@@ -9,7 +9,7 @@ Map::Map(QQuickItem *parent) :
     players.append(Player(1,O_Hereticus,QColor(0,0,255),":/images/flags/incflag.png"));
     activePlayer = &players[0];
     this->unittypes.append(UnitType(0,Tzinch_cult,"Культист","мясо", ":/images/units/111.png",
-                                    50,2,2,50,5,4,20,1,40));
+                                    100,2,2,50,5,4,20,1,40));
     this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/images/units/112.png",
                                     500,4,3,500,25,44,80,3,99999));
     unittypes[1].specialfeatures.append("lord");
@@ -17,11 +17,11 @@ Map::Map(QQuickItem *parent) :
                                     500,4,3,500,25,44,80,3,99999));
     unittypes[2].specialfeatures.append("lord");
     this->unittypes.append(UnitType(3,O_Hereticus,"Ополченец","легкая пехота", ":/images/units/114.png",
-                                    120,2,2,50,5,4,20,1,60));
+                                    180,2,2,50,5,4,20,1,60));
     this->unittypes.append(UnitType(4,O_Hereticus,"Лучник","стрелок", ":/images/units/116.png",
-                                    50,2,2,50,5,4,20,4,80));
+                                    100,2,2,50,5,4,20,4,80));
     this->unittypes.append(UnitType(5,Tzinch_cult,"мутант","рубака", ":/images/units/115.png",
-                                    150,2,3,50,8,6,20,1,80));
+                                    250,2,3,50,8,6,20,1,80));
     QFile file1(":/maps/map3.txt");
     /*UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
          double n_hp, int n_ap, double n_mp, double n_mor, double off,
@@ -180,14 +180,9 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
                     occupancy[target->getCellx()][target->getCelly()] = false;
                     if (target->type->specialfeatures.contains("lord"))
                     {
-                        Player *p = target->player;
-                        for (int k=0;k<units.length();++k)
-                        {
-                            if (units[k].player == p)
-                                units[k].player =NULL;
-                        }
+                        Player p = *target->player;
                         units.removeOne(*target);
-                        players.removeOne(*p);
+                        players.removeOne(p);
                         if (players.length()==1)
                             emit victory();
                     }
@@ -308,8 +303,7 @@ void Map::paint(QPainter *painter)
     int startrow = qFloor(m_cy / 64);
     int tilecountw = qFloor(width() / 64);
     int tilecounth = qFloor(height() / 64);
-    double tx, ty = 0.0f;   //tile x y
-    //qDebug()<<sizeX;
+    double tx, ty = 0.0f;
     QPixmap tile;
     QString tileSource;
     for (int i =startcol; i < startcol+tilecountw;++i)
@@ -371,26 +365,20 @@ void Map::paint(QPainter *painter)
                 painter->fillRect(sx,sy,64,64,QColor(255, 255, 0, 100));
 
             }
-            if ((focus.infocus->getAp()>0)&&(&units[i] != focus.infocus)&&(units[i].player != activePlayer)&&
-                    (qCeil(sqrt(pow(focus.infocus->getCellx()- units[i].getCellx() ,2) +
-                                pow(focus.infocus->getCelly() - units[i].getCelly(),2)))
-                     <=focus.infocus->type->getAttackRadius()))
+            if (focus.infocus->isAttackPossible(&units[i]))
             {
                 painter->fillRect(sx,sy,64,64,QColor(255, 0, 0, 100));
-
                 pen.setColor(QColor(255,0,0));
                 pen.setWidth(3);
                 painter->setPen(pen);
                 painter->drawRect(sx+2,sy+2,60,60);
-
             }
         }
-        painter->fillRect(sx+7,sy+55,50.0f*(units[i].getHp()/units[i].type->getNorm_hp()),4,QColor(0, 255, 0));
+        painter->fillRect(sx+7,sy+55,50.0f*(units[i].type->getNorm_hp()/600)*(units[i].getHp()/(units[i].type->getNorm_hp())),4,QColor(0, 255, 0));
         pen.setColor(QColor(0,255,0));
         pen.setWidth(1);
         painter->setPen(pen);
-        painter->drawRect(sx+7,sy+55,50,4);
-
+        painter->drawRect(sx+7,sy+55,50.0f*(units[i].type->getNorm_hp()/600),4);
         pen.setColor(units[i].player->color);
         pen.setWidth(2);
         painter->setPen(pen);
@@ -421,9 +409,6 @@ void Map::mousePressEvent(QMouseEvent * event)
 
 bool Map::isRecrPoss(int x, int y)
 {
-    /*qCeil(sqrt(pow((focus.infocus->getCellx()- units[i].getCellx()) ,2) +
-                                        pow((focus.infocus->getCelly()) - units[i].getCelly(),2)))
-                             <=*/
     int startcol = qFloor(m_cx / 64);
     int startrow = qFloor(m_cy / 64);
     int nx = qFloor(x / 64);
@@ -439,7 +424,6 @@ bool Map::isRecrPoss(int x, int y)
                 return true;
             }
         }
-
     }
     return false;
 }

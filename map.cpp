@@ -5,28 +5,28 @@ Map::Map(QQuickItem *parent) :
 {
     sizeX =0;sizeY =0;m_cx=0;m_cy=0;
     rercActive = false;
-    players.append(Player(0,Tzinch_cult,QColor(255,0,0)));
-    players.append(Player(1,O_Hereticus,QColor(0,0,255)));
+    players.append(Player(0,Tzinch_cult,QColor(255,0,0),":/images/flags/chaosflag.png"));
+    players.append(Player(1,O_Hereticus,QColor(0,0,255),":/images/flags/incflag.png"));
     activePlayer = &players[0];
-    this->unittypes.append(UnitType(0,Tzinch_cult,"Культист","мясо", ":/111.png",
+    this->unittypes.append(UnitType(0,Tzinch_cult,"Культист","мясо", ":/images/units/111.png",
                                     50,2,2,50,5,4,20,1,40));
-    this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/112.png",
+    this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/images/units/112.png",
                                     500,4,3,500,25,44,80,3,99999));
     unittypes[1].specialfeatures.append("lord");
-    this->unittypes.append(UnitType(2,O_Hereticus,"Инквизитор","командир", ":/113.png",
+    this->unittypes.append(UnitType(2,O_Hereticus,"Инквизитор","командир", ":/images/units/113.png",
                                     500,4,3,500,25,44,80,3,99999));
     unittypes[2].specialfeatures.append("lord");
-    this->unittypes.append(UnitType(3,O_Hereticus,"Ополченец","легкая пехота", ":/114.png",
+    this->unittypes.append(UnitType(3,O_Hereticus,"Ополченец","легкая пехота", ":/images/units/114.png",
                                     120,2,2,50,5,4,20,1,60));
-    this->unittypes.append(UnitType(4,O_Hereticus,"Лучник","стрелок", ":/116.png",
+    this->unittypes.append(UnitType(4,O_Hereticus,"Лучник","стрелок", ":/images/units/116.png",
                                     50,2,2,50,5,4,20,4,80));
-    this->unittypes.append(UnitType(5,Tzinch_cult,"мутант","рубака", ":/115.png",
+    this->unittypes.append(UnitType(5,Tzinch_cult,"мутант","рубака", ":/images/units/115.png",
                                     150,2,3,50,8,6,20,1,80));
-    QFile file1("E:/QtProjects/untitled13/map3.txt");
+    QFile file1(":/maps/map3.txt");
     /*UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
          double n_hp, int n_ap, double n_mp, double n_mor, double off,
          double def, double damage, int attackR,int cost)*/
-
+    turnNum = 0;
     file1.open(QIODevice::ReadOnly);
     QByteArray a = file1.readAll();
     QString astr = a;
@@ -143,43 +143,23 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
     int startrow = qFloor(m_cy / 64);
     int nx = qFloor(x / 64);
     int ny = qFloor(y / 64);
-    bool f=false;
-    if (btn == Qt::LeftButton /*&& focus.isEmpty()*/)
+    if (btn == Qt::LeftButton)
     {
-        for (int i = 0; i < units.length();++i)
+        Unit *target = unitOnCell(nx+startcol,ny+startrow);
+        if (target !=NULL)
         {
-
-            int tx=64*(units[i].getCellx() - startcol);
-            int ty=64*(units[i].getCelly() - startrow);
-            if ((x > tx && x < tx+64) &&
-                    (y > ty && y < ty+64))
-            {
-                f = true;
-                if (activePlayer == units[i].player)
-                    focus.setInfocus(&units[i]);
-                //qDebug()<<focus.infocus->type->getName()<<focus.infocus->getCellx()<<focus.infocus->getCelly();
-
-            }
-            if (!f)
-                focus.clear();
-
+            if (target->player == activePlayer)
+                focus.setInfocus(target);
         }
+        else
+            focus.clear();
     } else if (btn == Qt::RightButton && !focus.isEmpty())
     {
-
         if (!occupancy[nx+startcol][ny+startrow])
         {
-            if (pow((focus.infocus->getCellx()- startcol- nx) ,2) +
-                pow((focus.infocus->getCelly()- startrow) - ny,2) <=
-                pow(focus.infocus->getMp(),2))
+            if (focus.infocus->isMovementPossible(mapArr, occupancy, nx+startcol, ny + startrow))
             {
-                occupancy[nx+startcol][ny+startrow] = true;
-                occupancy[focus.infocus->getCellx()][focus.infocus->getCelly()]=false;
-                focus.infocus->setMp(focus.infocus->getMp()
-                                     - qCeil(sqrt(pow((focus.infocus->getCellx()- startcol- nx) ,2) +
-                                                  pow((focus.infocus->getCelly()- startrow) - ny,2))));
-                focus.infocus->setCellx(nx+startcol);
-                focus.infocus->setCelly(ny+startrow);
+                focus.infocus->move(mapArr, occupancy, nx+startcol, ny + startrow);
                 for (int k=0;k<villages.length();++k)
                 {
                     if (villages[k].cellx == focus.infocus->getCellx() &&
@@ -190,31 +170,29 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
                         k = villages.length();
                     }
                 }
-
             }
         } else {
-            if (focus.infocus->getAp()>0)
-            for (int i=0; i < units.length();++i)
+            Unit *target = unitOnCell(nx+startcol, ny +startrow);
+            if (focus.infocus->isAttackPossible(target))
             {
-                if (units[i].getCellx() == nx+startcol && units[i].getCelly() == ny+startrow)
+                if (focus.infocus->attack(target))
                 {
-                    if (units[i].player != focus.infocus->player)
+                    occupancy[target->getCellx()][target->getCelly()] = false;
+                    if (target->type->specialfeatures.contains("lord"))
                     {
-                        if ((qCeil(sqrt(pow((focus.infocus->getCellx()- units[i].getCellx()) ,2) +
-                                        pow((focus.infocus->getCelly()) - units[i].getCelly(),2)))
-                             <=focus.infocus->type->getAttackRadius()))
+                        Player *p = target->player;
+                        for (int k=0;k<units.length();++k)
                         {
-                            qDebug()<<"bam"<<nx+startcol<<ny+startrow;
-                            focus.infocus->setAp(focus.infocus->getAp()-1);
-                            units[i].setHp(units[i].getHp()-focus.infocus->type->getDamage());
-                            if (units[i].getHp()<=0)
-                            {
-                                occupancy[units[i].getCellx()][units[i].getCelly()] = false;
-                                units.removeAt(i);
-                            }
+                            if (units[k].player == p)
+                                units[k].player =NULL;
                         }
+                        units.removeOne(*target);
+                        players.removeOne(*p);
+                        if (players.length()==1)
+                            emit victory();
                     }
-                    i = units.length()+100;
+                    else
+                        units.removeOne(*target);
                 }
             }
         }
@@ -225,6 +203,7 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
 
 void Map::newturn()
 {
+    ++turnNum;
     activePlayer->cash += activePlayer->villages * 5 - activePlayer->units;
     for (int i=0;i<units.length();++i)
     {
@@ -241,7 +220,6 @@ void Map::newturn()
     }
     for (int i=0;i<players.length();++i)
     {
-        qDebug()<<i;
         if (players[i].getid() == activePlayer->getid())
         {
             activePlayer = i < (players.length()-1) ? &players[i+1] : &players[0];
@@ -266,6 +244,7 @@ void Map::newturn()
     }
 
     this->update();
+
 }
 
 double Map::cx() const
@@ -345,11 +324,11 @@ void Map::paint(QPainter *painter)
                 tile = tileCache.value(tileSource);
             }
             else {
-                tile = QPixmap("E:/QtProjects/untitled13/"+tileSource+".png");
+                tile = QPixmap(":/images/terrains/"+tileSource+".png");
                 tileCache.insert(tileSource, tile);
             }
             if (mapArr[i][j]==5)
-                painter->drawPixmap(tx, ty, QPixmap("E:/QtProjects/untitled13/1.png"));
+                painter->drawPixmap(tx, ty, QPixmap(":/images/terrains/1.png"));
             painter->drawPixmap(tx, ty, tile);
             painter->setFont(QFont("Helvetica", 8));
             painter->setPen(QColor(255, 255, 255, 100));
@@ -437,24 +416,6 @@ void Map::paint(QPainter *painter)
 
 void Map::mousePressEvent(QMouseEvent * event)
 {
-    /*if (event->buttons().testFlag(Qt::LeftButton) && focus.isEmpty)
-    {
-        int startcol = qFloor(m_cx / 64);
-        int startrow = qFloor(m_cy / 64);
-        for (int i = 0; i < units.length();++i)
-        {
-            int tx=64*(units[i].getCellx() - startcol);
-            int ty=64*(units[i].getCelly() - startrow);
-            if ((event->x > tx || event->x < tx+64) &&
-                    (event->y > ty || event->y < ty+64))
-            {
-                focus.setInfocus(&units[i]);
-            }
-            //qDebug()<<event->x;
-            //int yo=event->x();
-        }
-    }*/
-    //qDebug()<<event->x();
     qDebug()<<"event->x()";
 }
 
@@ -481,4 +442,14 @@ bool Map::isRecrPoss(int x, int y)
 
     }
     return false;
+}
+
+Unit * Map::unitOnCell(int cellx, int celly)
+{
+    for (int i=0; i < units.length();++i)
+    {
+        if (units[i].getCellx() == cellx && units[i].getCelly() == celly)
+            return &units[i];
+    }
+    return NULL;
 }

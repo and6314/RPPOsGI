@@ -4,17 +4,20 @@
 #include <QObject>
 #include <unittype.h>
 #include <QColor>
+#include <QPixmap>
 class Player
 {
 public:
     Player();
-    Player(int id,Fraction f,QColor col);
+    Player(int id,Fraction f,QColor col, QString flagsource);
     Fraction fraction;
     int getid();
     QColor color;
     int cash;
     int villages;
     int units;
+    QPixmap flag;
+    bool operator==(const Player& arg);
 
 private:
     int id;

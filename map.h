@@ -59,6 +59,7 @@ public:
     Q_INVOKABLE bool isFocusEmpty();
     Q_INVOKABLE void setLastxy(double ls,double ly);
     Q_INVOKABLE QString getFocus();
+    Unit *unitOnCell(int cellx, int celly);
     double lastx;
     double lasty;
     bool **occupancy;   //true if cell is occupied
@@ -70,6 +71,7 @@ signals:
     void sizeXChanged();
     void sizeYChanged();
     void activePlayerChanged();
+    void victory();
 
 
 public slots:
@@ -83,7 +85,7 @@ private:
     int sizeY;
     double m_cx;
     double m_cy;
-
+    int turnNum;
 
     bool rercActive;
 

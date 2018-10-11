@@ -91,6 +91,14 @@ ApplicationWindow {
                         }
                     }
                 }
+                onVictory: {
+
+                    gamearea.visible = false
+                    rightPanel.visible = false
+                    topPanel.visible = false
+                    turnButton.visible = false
+                    victoryScreen.visible = true
+                }
             }
 
         }
@@ -188,70 +196,11 @@ ApplicationWindow {
 
         }
     }
-    /*BackEnd {
-        id: backend
+    VictoryScreen {
+        id: victoryScreen
+        visible: false
+
+
+
     }
-    Flickable {
-        contentWidth: 1000
-        contentHeight: 1000
-        width: 400
-        height: 400
-        boundsBehavior: Flickable.StopAtBounds
-
-        id: menu
-        anchors.fill: parent
-    TextField {
-        id : txt1
-        text: menu.contentY
-        placeholderText: qsTr("User name")
-        anchors.centerIn: parent
-
-        onTextChanged: menu.contentY
-    }
-    TextField {
-        id : txt2
-        text: backend.userName
-        placeholderText: qsTr("User name")
-        //anchors.top: txt1
-
-        onTextChanged: backend.userName = text
-    }
-    Button {
-        id: btn1
-        text: "push me"
-        x: 50
-        y: 50
-        onClicked:
-        {
-            backend.start()
-            txt2.text= backend.userName
-            menu.visible = false
-            for (var i=0; i!=backend.sizeX;++i)
-            {
-                for (var j=0; j!=backend.sizeY;++j)
-                {
-                    var component = Qt.createComponent("im0.qml")
-                    component.createObject(root, {
-                        height : 64,
-                        width : 64,
-                        x : 20 + j *64,
-                        y : 20 + i *64
-                    })
-                }
-            }
-        }
-    }
-    }*/
-
-    /*MouseArea {
-            anchors.fill: parent
-            onClicked: BackEnd.rename()
-    }*/
-    /*MyButton {
-       id: mb1
-       color: "blue"
-       anchors.right: txt1
-       anchors.bottom: txt1
-
-    }*/
 }

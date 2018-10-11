@@ -35,6 +35,13 @@ Unit::Unit(UnitType *unittype,Player *p, int cellx, int celly)
     player->units+=1;
 }
 
+bool Unit::operator==(const Unit& arg)
+{
+    if (this->cellx == arg.cellx && this->celly == arg.celly)
+        return true;
+    return false;
+}
+
 void Unit::setHp(double hp)
 {
     this->hp = hp;
@@ -123,4 +130,50 @@ void Unit::setCelly(int c)
 int Unit::getCelly()
 {
     return this->celly;
+}
+
+bool Unit::attack(Unit *target)
+{
+    this->setAp(this->getAp()-1);
+    target->setHp(target->getHp()-this->type->getDamage());
+    if (target->getHp()<=0)
+        return true;
+    return false;
+}
+
+bool Unit::isAttackPossible(Unit *target)
+{
+    if (target!=NULL)
+    {
+        if (target->player!=this->player && this->getAp()>0)
+        {
+            if ((qCeil(sqrt(pow((this->getCellx()- target->getCellx()) ,2) +
+                            pow((this->getCelly()) - target->getCelly(),2)))
+                 <=this->type->getAttackRadius()))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool Unit::isMovementPossible(int **map, bool **occupancy, int cellx, int celly)
+{
+    if (!occupancy[cellx][celly])
+    {
+        if (pow(this->getCellx()- cellx,2) +
+            pow(this->getCelly()- celly,2) <=
+            pow(this->getMp(),2))
+            return true;
+    }
+    return false;
+}
+
+void Unit::move(int **map, bool **occupancy, int cellx, int celly)
+{
+    occupancy[cellx][celly] = true;
+    occupancy[this->cellx][this->celly] = false;
+    setMp(this->mp - qCeil(sqrt(pow(this->cellx- cellx ,2) +
+                                pow(this->celly- celly,2))));
+    this->cellx = cellx;
+    this->celly = celly;
 }

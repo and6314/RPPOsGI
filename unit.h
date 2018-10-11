@@ -5,6 +5,7 @@
 #include <unittype.h>
 #include <QObject>
 #include "player.h"
+#include <qmath.h>
 
 class Unit
 {
@@ -36,6 +37,11 @@ public:
     void setCelly(int c);
     int getCelly();
     bool isFocusEmpty();
+    bool attack(Unit *target); //возвращает убита ли цель
+    bool isAttackPossible(Unit *target);
+    bool operator==(const Unit& arg);
+    bool isMovementPossible(int **map, bool **occupancy, int cellx, int celly);
+    void move(int **map, bool **occupancy, int cellx, int celly);
 
 private:
     double hp; //current

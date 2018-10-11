@@ -9,13 +9,16 @@ RightPanel::RightPanel(QQuickItem *parent) :
 void RightPanel::paint(QPainter *painter)
 {
     painter->fillRect(0,0,width(),height(),QColor(25,30,75));
+
     if (this->m!=NULL)
     {
         painter->fillRect(30,30,width()-60,width()-60,m->activePlayer->color);
+        painter->drawPixmap(30,30,m->activePlayer->flag);
         if (!m->isFocusEmpty())
         {
             painter->setFont(QFont("Helvetica", 10));
             painter->setPen(QColor(255, 255, 255));
+
             painter->drawText(QRectF(30, width(), 250, 25),
                               Qt::AlignLeft,"Название : "+ m->focus.infocus->type->getName());
             painter->drawText(QRectF(30, width()+30, 250, 25),

@@ -4,10 +4,11 @@ Player::Player()
 {
 
 }
-Player::Player(int id, Fraction f, QColor col, QString flagsource)
+Player::Player(int id, Fraction f,Person p, QColor col, QString flagsource)
 {
     fraction = f;
     this->id = id;
+    person = p;
     color = col;
     cash = 100;
     villages = 0;

@@ -66,6 +66,8 @@ void Map::paint(QPainter *painter)
             painter->drawText(QRectF(tx, ty, 64, 64),
                               Qt::AlignCenter,
                               QString::number(i)+":"+QString::number(j));
+            painter->setPen(QColor(255, 255, 255, 60));
+            painter->drawRect(tx,ty,64,64);
             if (!focus.isEmpty())
                 if (occupancy[i][j] == false)
                     if (pow(64*(focus.infocus->getCellx()- startcol) - tx,2) +
@@ -326,6 +328,7 @@ void Map::clear()
     players.clear();
     sizeX =0;sizeY =0;m_cx=0;m_cy=0;turnNum = 0;
     activePlayer =NULL;
+    focus.clear();
 }
 
 int ** Map::getMapArr()

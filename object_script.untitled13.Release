@@ -14,6 +14,7 @@ INPUT(
 ./release\qrc_qml.o
 ./release\moc_backend.o
 ./release\moc_map.o
+./release\moc_game.o
 ./release\moc_recruitment.o
 ./release\moc_toppanel.o
 ./release\moc_rightpanel.o

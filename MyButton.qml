@@ -9,15 +9,8 @@ Rectangle {
     border {
         color: "grey"
         width: 2
+    }
 
-    }
-    Text {
-        color: "white"
-        font.family: "Helvetica"
-        font.pointSize: 12
-        text: "Конец хода"
-        anchors.centerIn: parent
-    }
 
     MouseArea {
             anchors.fill: parent

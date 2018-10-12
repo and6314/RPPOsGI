@@ -5,14 +5,14 @@
 #include "recruitment.h"
 #include "toppanel.h"
 #include "rightpanel.h"
+#include "game.h"
 
 int main(int argc, char *argv[])
 {
 
 
     QGuiApplication app(argc, argv);
-
-    //Recruitment
+    qmlRegisterType<Game>("game", 1, 0, "Game");
     qmlRegisterType<Recruitment>("recruitment", 1, 0, "Recruitment");
     qmlRegisterType<BackEnd>("backend", 1, 0, "BackEnd");
     qmlRegisterType<Map>("map", 1, 0, "Map");

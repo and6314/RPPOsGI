@@ -11,17 +11,25 @@ Recruitment::Recruitment(QQuickItem *parent) :
 
 void Recruitment::paint(QPainter *painter)
 {
+
     QPixmap sprite;
     int n=0;
     if (m!=NULL){
+        if (m->gameInProgress) {
+        if (m->activePlayer!=NULL && focus!=NULL)
+            if (focus->fraction != m->activePlayer->fraction
+                    || m->activePlayer->cash <= focus->cost)
+                focus=NULL;
         for (int i=0;i<m->unittypes.length();++i)
         {
 
             if (m->unittypes[i].fraction == m->activePlayer->fraction &&
                     m->activePlayer->cash >= m->unittypes[i].cost)
             {
-                if (focus==NULL)
+                if (focus==NULL || focus->fraction != m->activePlayer->fraction
+                        || m->activePlayer->cash <= focus->cost)
                     focus=&m->unittypes[i];
+
                 if(spriteCache.contains(m->unittypes[i].getImSorce())) {
                     sprite = spriteCache.value(m->unittypes[i].getImSorce());
                 }
@@ -51,7 +59,7 @@ void Recruitment::paint(QPainter *painter)
                 ++n;
             }
         }
-    }
+    }}
 }
 
 Map *Recruitment::map()
@@ -76,16 +84,17 @@ void Recruitment::mouseClicked(int x, int y)
             focus = &m->unittypes[i];
     }
     this->update();
-    //qDebug()<<rel.value(ny);
-
 }
 
 void Recruitment::acceptr()
 {
-    m->units.append(Unit(focus,m->activePlayer,qFloor(m->lastx/64)+qFloor(m->cx()/64),qFloor(m->lasty/64)+qFloor(m->cy()/64)));
-    m->occupancy[qFloor(m->lastx/64)+qFloor(m->cx()/64)][qFloor(m->lasty/64)+qFloor(m->cy()/64)] = true;
-    m->activePlayer->units+=1;
-    m->activePlayer->cash-=focus->cost;
+    if (focus!=NULL)
+    {
+        m->units.append(Unit(focus,m->activePlayer,qFloor(m->lastx/64)+qFloor(m->cx()/64),qFloor(m->lasty/64)+qFloor(m->cy()/64)));
+        m->occupancy[qFloor(m->lastx/64)+qFloor(m->cx()/64)][qFloor(m->lasty/64)+qFloor(m->cy()/64)] = true;
+        m->activePlayer->units+=1;
+        m->activePlayer->cash-=focus->cost;
+    }
     m->update();
 }
 

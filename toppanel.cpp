@@ -12,6 +12,7 @@ void TopPanel::paint(QPainter *painter)
     painter->fillRect(0,0,width(),height(),QColor(25,30,75));
     if (this->m!=NULL)
     {
+        if (m->gameInProgress) {
         painter->setFont(QFont("Helvetica", 10));
         painter->setPen(QColor(255, 255, 255));
         painter->drawText(QRectF(0, 3, 250, 25),
@@ -24,7 +25,7 @@ void TopPanel::paint(QPainter *painter)
                           Qt::AlignCenter,"Юниты : "+
                           QString::number(m->activePlayer->units));
     }
-
+    }
 }
 
 Map *TopPanel::map()

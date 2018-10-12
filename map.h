@@ -45,7 +45,6 @@ public:
     Q_INVOKABLE bool isCellEmpty(int x, int y);
     QList<Unit> unitsList();
     QList<UnitType> unittypesList();
-    /*void setUnitsList();*/
     int **getMapArr();
     void setMapArr(int **m);
     int getSizeX();
@@ -60,9 +59,13 @@ public:
     Q_INVOKABLE void setLastxy(double ls,double ly);
     Q_INVOKABLE QString getFocus();
     Unit *unitOnCell(int cellx, int celly);
+    void distributePlayers();
+    void readMap(QString filename);
     double lastx;
     double lasty;
+    bool gameInProgress;
     bool **occupancy;   //true if cell is occupied
+    void clear();
 
 signals:
     void cxChanged(double cx);

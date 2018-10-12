@@ -14,6 +14,7 @@ INPUT(
 ./debug\qrc_qml.o
 ./debug\moc_backend.o
 ./debug\moc_map.o
+./debug\moc_game.o
 ./debug\moc_recruitment.o
 ./debug\moc_toppanel.o
 ./debug\moc_rightpanel.o

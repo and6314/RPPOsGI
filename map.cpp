@@ -5,9 +5,8 @@ Map::Map(QQuickItem *parent) :
 {
     sizeX =0;sizeY =0;m_cx=0;m_cy=0;
     rercActive = false;
-    players.append(Player(0,Tzinch_cult,QColor(255,0,0),":/images/flags/chaosflag.png"));
-    players.append(Player(1,O_Hereticus,QColor(0,0,255),":/images/flags/incflag.png"));
-    activePlayer = &players[0];
+    gameInProgress = false;
+    activePlayer =NULL;
     this->unittypes.append(UnitType(0,Tzinch_cult,"Культист","мясо", ":/images/units/111.png",
                                     100,2,2,50,5,4,20,1,40));
     this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/images/units/112.png",
@@ -22,119 +21,123 @@ Map::Map(QQuickItem *parent) :
                                     100,2,2,50,5,4,20,4,80));
     this->unittypes.append(UnitType(5,Tzinch_cult,"мутант","рубака", ":/images/units/115.png",
                                     250,2,3,50,8,6,20,1,80));
-    QFile file1(":/maps/map3.txt");
     /*UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
          double n_hp, int n_ap, double n_mp, double n_mor, double off,
          double def, double damage, int attackR,int cost)*/
     turnNum = 0;
-    file1.open(QIODevice::ReadOnly);
-    QByteArray a = file1.readAll();
-    QString astr = a;
-    QStringList s = astr.split(',');
-    bool ok,pl = true;
-    sizeX = s.at(0).toInt(&ok,10);
-    sizeY = s.at(1).toInt(&ok,10);
-    int **arr = new int *[s.at(0).toInt(&ok,10)];
-    occupancy = new bool *[s.at(0).toInt(&ok,10)];
-    for (int i =0; i< s.at(0).toInt(&ok,10); ++i)
-    {
-        arr[i] = new int[s.at(1).toInt(&ok,10)];
-        occupancy[i] = new bool[s.at(1).toInt(&ok,10)];
-    }
-    for (int i=0;i<sizeX;++i)
-    {
-        for (int j=0;j< sizeY;++j)
-        {
-            arr[i][j] = s.at(2 + i*sizeX + j).toInt(&ok,10);
-            occupancy[i][j] = false;
-            if (arr[i][j] == 5)
-            {
-                villages.append(Village(i,j));
-            }
-            else if (arr[i][j] == 3 && pl)
-            {
-                for (int k=0;k<unittypes.length();++k)
-                {
-                    if (unittypes[k].fraction == activePlayer->fraction && unittypes[k].specialfeatures.contains("lord"))
-                    {
-                        this->units.append(Unit(&unittypes[k],activePlayer,i,j));
-                        occupancy[i][j] = true;
-                        k = unittypes.length();
-                        for (int p=0; p<players.length();++p)
-                        {
-                            if (&players[p] == activePlayer)
-                            {
-
-                                if (p == players.length()-1)
-                                    pl = false;
-                                else
-                                    activePlayer = &players[p+1];
-                                p = players.length();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    mapArr = arr;
-    file1.close();
-    activePlayer = &players[0];
     connect(this, SIGNAL(xChanged()), this, SLOT(update()));
     connect(this, SIGNAL(yChanged()), this, SLOT(update())); 
 }
 
-int ** Map::getMapArr()
-{
-    return mapArr;
-}
-
-void Map::setMapArr(int **m)
-{
-    mapArr = m;
-    emit mapArrChanged();
-}
-
-int Map::getSizeX()
-{
-    return sizeX;
-}
-
-void Map::setSizeX(const int &sx)
-{
-    sizeX = sx;
-    emit sizeXChanged();
-}
-
-int Map::getSizeY()
-{
-    return sizeY;
-}
-
-void Map::setSizeY(const int &sy)
-{
-    sizeY = sy;
-    emit sizeYChanged();
-}
-
-QList<Unit> Map::unitsList()
-{
-    return units;
-}
-
-QList<UnitType> Map::unittypesList()
-{
-    return unittypes;
-}
-
-void Map::start()
+void Map::paint(QPainter *painter)
 {
 
-}
+    if (gameInProgress)
+    {
 
-bool Map::isCellEmpty(int x, int y)
-{
-    return !occupancy[qFloor(m_cx / 64)+qFloor(x / 64)][qFloor(m_cy / 64)+qFloor(y / 64)];
+    QPen pen = QPen();
+    int startcol = qFloor(m_cx / 64);
+    int startrow = qFloor(m_cy / 64);
+    int tilecountw = qFloor(width() / 64);
+    int tilecounth = qFloor(height() / 64);
+    double tx, ty = 0.0f;
+    QPixmap tile;
+    QString tileSource;
+    for (int i =startcol; i < startcol+tilecountw;++i)
+    {
+        for (int j=startrow;j<startrow+tilecounth;++j)
+        {
+            tx=64*(i - startcol);
+            ty=64*(j - startrow);
+
+            tileSource = QString::number(mapArr[i][j]);
+            if(tileCache.contains(tileSource)) {
+                tile = tileCache.value(tileSource);
+            }
+            else {
+                tile = QPixmap(":/images/terrains/"+tileSource+".png");
+                tileCache.insert(tileSource, tile);
+            }
+            if (mapArr[i][j]==5)
+                painter->drawPixmap(tx, ty, QPixmap(":/images/terrains/1.png"));
+            painter->drawPixmap(tx, ty, tile);
+            painter->setFont(QFont("Helvetica", 8));
+            painter->setPen(QColor(255, 255, 255, 100));
+            painter->drawText(QRectF(tx, ty, 64, 64),
+                              Qt::AlignCenter,
+                              QString::number(i)+":"+QString::number(j));
+            if (!focus.isEmpty())
+                if (occupancy[i][j] == false)
+                    if (pow(64*(focus.infocus->getCellx()- startcol) - tx,2) +
+                        pow(64*(focus.infocus->getCelly()- startrow) - ty,2) <=
+                        pow(64*focus.infocus->getMp(),2))
+                    {
+                        painter->fillRect(tx,ty,64,64,QColor(0, 200, 0, 95));
+
+                    }
+        }
+    }
+    double sx, sy = 0.0f;
+    QPixmap sprite;
+    QString spriteSource;
+    for (int i = 0; i<units.length();++i)
+    {
+        if (units[i].getCellx() < startcol && units[i].getCelly() < startrow)
+            continue;
+        sx = 64*(units[i].getCellx() - startcol);
+        sy = 64*(units[i].getCelly() - startrow);
+        spriteSource = units[i].type->getImSorce();
+        if(tileCache.contains(spriteSource)) {
+            sprite = tileCache.value(spriteSource);
+        }
+        else {
+            sprite = QPixmap(spriteSource);
+            tileCache.insert(spriteSource, sprite);
+        }
+
+        if (!focus.isEmpty())
+        {
+            if (focus.infocus==&units[i] )
+            {
+                painter->fillRect(sx,sy,64,64,QColor(255, 255, 0, 100));
+
+            }
+            if (focus.infocus->isAttackPossible(&units[i]))
+            {
+                painter->fillRect(sx,sy,64,64,QColor(255, 0, 0, 100));
+                pen.setColor(QColor(255,0,0));
+                pen.setWidth(3);
+                painter->setPen(pen);
+                painter->drawRect(sx+2,sy+2,60,60);
+            }
+        }
+        painter->fillRect(sx+7,sy+55,50.0f*(units[i].type->getNorm_hp()/600)*(units[i].getHp()/(units[i].type->getNorm_hp())),4,QColor(0, 255, 0));
+        pen.setColor(QColor(0,255,0));
+        pen.setWidth(1);
+        painter->setPen(pen);
+        painter->drawRect(sx+7,sy+55,50.0f*(units[i].type->getNorm_hp()/600),4);
+        pen.setColor(units[i].player->color);
+        pen.setWidth(2);
+        painter->setPen(pen);
+        painter->drawLine(sx+50,sy+40,sx+50,sy+55);
+        painter->fillRect(sx+50,sy+40,10,5,units[i].player->color);
+        painter->drawPixmap(sx, sy, sprite);
+    }
+    for (int k=0;k<villages.length();++k)
+    {
+        if (villages[k].player == NULL)
+            continue;
+        if (villages[k].cellx >= startcol && villages[k].cellx <startcol+tilecountw &&
+            villages[k].celly >= startrow && villages[k].celly <startrow+tilecounth)
+        {
+            pen.setColor(villages[k].player->color);
+            pen.setWidth(2);
+            painter->setPen(pen);
+            painter->drawLine((villages[k].cellx - startcol)*64+50,(villages[k].celly - startrow)*64+40,(villages[k].cellx - startcol)*64+50,(villages[k].celly - startrow)*64+55);
+            painter->fillRect((villages[k].cellx - startcol)*64+50,(villages[k].celly - startrow)*64+40,10,5,villages[k].player->color);
+        }
+    }
+    }
 }
 
 void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
@@ -242,6 +245,142 @@ void Map::newturn()
 
 }
 
+void Map::distributePlayers()
+{
+    activePlayer = &players[0];
+    bool pl = true;
+    for (int i=0;i<sizeX;++i)
+    {
+        for (int j=0;j< sizeY;++j)
+        {
+            if (mapArr[i][j] == 3 && pl)
+            {
+                for (int k=0;k<unittypes.length();++k)
+                {
+                    if (unittypes[k].fraction == activePlayer->fraction && unittypes[k].specialfeatures.contains("lord"))
+                    {
+                        this->units.append(Unit(&unittypes[k],activePlayer,i,j));
+                        occupancy[i][j] = true;
+                        k = unittypes.length();
+                        for (int p=0; p<players.length();++p)
+                        {
+                            if (&players[p] == activePlayer)
+                            {
+
+                                if (p == players.length()-1)
+                                    pl = false;
+                                else
+                                    activePlayer = &players[p+1];
+                                p = players.length();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    activePlayer = &players[0];
+}
+
+void Map::readMap(QString filename)
+{
+    QFile file1(filename);
+    file1.open(QIODevice::ReadOnly);
+    QByteArray a = file1.readAll();
+    QString astr = a;
+    QStringList s = astr.split(',');
+    bool ok = true;
+    sizeX = s.at(0).toInt(&ok,10);
+    sizeY = s.at(1).toInt(&ok,10);
+    int **arr = new int *[s.at(0).toInt(&ok,10)];
+    occupancy = new bool *[s.at(0).toInt(&ok,10)];
+    for (int i =0; i< s.at(0).toInt(&ok,10); ++i)
+    {
+        arr[i] = new int[s.at(1).toInt(&ok,10)];
+        occupancy[i] = new bool[s.at(1).toInt(&ok,10)];
+    }
+    for (int i=0;i<sizeX;++i)
+    {
+        for (int j=0;j< sizeY;++j)
+        {
+            arr[i][j] = s.at(2 + i*sizeX + j).toInt(&ok,10);
+            occupancy[i][j] = false;
+            if (arr[i][j] == 5)
+            {
+                villages.append(Village(i,j));
+            }
+        }
+    }
+    mapArr = arr;
+    file1.close();
+}
+
+void Map::clear()
+{
+    for (int i=0;i<sizeX;++i)
+    {
+        delete []mapArr[i];
+        delete []occupancy[i];
+    }
+    units.clear();
+    players.clear();
+    sizeX =0;sizeY =0;m_cx=0;m_cy=0;turnNum = 0;
+    activePlayer =NULL;
+}
+
+int ** Map::getMapArr()
+{
+    return mapArr;
+}
+
+void Map::setMapArr(int **m)
+{
+    mapArr = m;
+    emit mapArrChanged();
+}
+
+int Map::getSizeX()
+{
+    return sizeX;
+}
+
+void Map::setSizeX(const int &sx)
+{
+    sizeX = sx;
+    emit sizeXChanged();
+}
+
+int Map::getSizeY()
+{
+    return sizeY;
+}
+
+void Map::setSizeY(const int &sy)
+{
+    sizeY = sy;
+    emit sizeYChanged();
+}
+
+QList<Unit> Map::unitsList()
+{
+    return units;
+}
+
+QList<UnitType> Map::unittypesList()
+{
+    return unittypes;
+}
+
+void Map::start()
+{
+
+}
+
+bool Map::isCellEmpty(int x, int y)
+{
+    return !occupancy[qFloor(m_cx / 64)+qFloor(x / 64)][qFloor(m_cy / 64)+qFloor(y / 64)];
+}
+
 double Map::cx() const
 {
     return m_cx;
@@ -296,111 +435,6 @@ void Map::setLastxy(double ls,double ly)
     lasty = ly;
 }
 
-void Map::paint(QPainter *painter)
-{
-    QPen pen = QPen();
-    int startcol = qFloor(m_cx / 64);
-    int startrow = qFloor(m_cy / 64);
-    int tilecountw = qFloor(width() / 64);
-    int tilecounth = qFloor(height() / 64);
-    double tx, ty = 0.0f;
-    QPixmap tile;
-    QString tileSource;
-    for (int i =startcol; i < startcol+tilecountw;++i)
-    {
-        for (int j=startrow;j<startrow+tilecounth;++j)
-        {
-            tx=64*(i - startcol);
-            ty=64*(j - startrow);
-
-            tileSource = QString::number(mapArr[i][j]);
-            if(tileCache.contains(tileSource)) {
-                tile = tileCache.value(tileSource);
-            }
-            else {
-                tile = QPixmap(":/images/terrains/"+tileSource+".png");
-                tileCache.insert(tileSource, tile);
-            }
-            if (mapArr[i][j]==5)
-                painter->drawPixmap(tx, ty, QPixmap(":/images/terrains/1.png"));
-            painter->drawPixmap(tx, ty, tile);
-            painter->setFont(QFont("Helvetica", 8));
-            painter->setPen(QColor(255, 255, 255, 100));
-            painter->drawText(QRectF(tx, ty, 64, 64),
-                              Qt::AlignCenter,
-                              QString::number(i)+":"+QString::number(j));
-            if (!focus.isEmpty())
-                if (occupancy[i][j] == false)
-                    if (pow(64*(focus.infocus->getCellx()- startcol) - tx,2) +
-                        pow(64*(focus.infocus->getCelly()- startrow) - ty,2) <=
-                        pow(64*focus.infocus->getMp(),2))
-                    {
-                        painter->fillRect(tx,ty,64,64,QColor(0, 200, 0, 95));
-
-                    }
-        }
-    }
-    double sx, sy = 0.0f;
-    QPixmap sprite;
-    QString spriteSource;
-    for (int i = 0; i<units.length();++i)
-    {
-        if (units[i].getCellx() < startcol && units[i].getCelly() < startrow)
-            continue;
-        sx = 64*(units[i].getCellx() - startcol);
-        sy = 64*(units[i].getCelly() - startrow);
-        spriteSource = units[i].type->getImSorce();
-        if(tileCache.contains(spriteSource)) {
-            sprite = tileCache.value(spriteSource);
-        }
-        else {
-            sprite = QPixmap(spriteSource);
-            tileCache.insert(spriteSource, sprite);
-        }
-
-        if (!focus.isEmpty())
-        {
-            if (focus.infocus==&units[i] )
-            {
-                painter->fillRect(sx,sy,64,64,QColor(255, 255, 0, 100));
-
-            }
-            if (focus.infocus->isAttackPossible(&units[i]))
-            {
-                painter->fillRect(sx,sy,64,64,QColor(255, 0, 0, 100));
-                pen.setColor(QColor(255,0,0));
-                pen.setWidth(3);
-                painter->setPen(pen);
-                painter->drawRect(sx+2,sy+2,60,60);
-            }
-        }
-        painter->fillRect(sx+7,sy+55,50.0f*(units[i].type->getNorm_hp()/600)*(units[i].getHp()/(units[i].type->getNorm_hp())),4,QColor(0, 255, 0));
-        pen.setColor(QColor(0,255,0));
-        pen.setWidth(1);
-        painter->setPen(pen);
-        painter->drawRect(sx+7,sy+55,50.0f*(units[i].type->getNorm_hp()/600),4);
-        pen.setColor(units[i].player->color);
-        pen.setWidth(2);
-        painter->setPen(pen);
-        painter->drawLine(sx+50,sy+40,sx+50,sy+55);
-        painter->fillRect(sx+50,sy+40,10,5,units[i].player->color);
-        painter->drawPixmap(sx, sy, sprite);
-    }
-    for (int k=0;k<villages.length();++k)
-    {
-        if (villages[k].player == NULL)
-            continue;
-        if (villages[k].cellx >= startcol && villages[k].cellx <startcol+tilecountw &&
-            villages[k].celly >= startrow && villages[k].celly <startrow+tilecounth)
-        {
-            pen.setColor(villages[k].player->color);
-            pen.setWidth(2);
-            painter->setPen(pen);
-            painter->drawLine((villages[k].cellx - startcol)*64+50,(villages[k].celly - startrow)*64+40,(villages[k].cellx - startcol)*64+50,(villages[k].celly - startrow)*64+55);
-            painter->fillRect((villages[k].cellx - startcol)*64+50,(villages[k].celly - startrow)*64+40,10,5,villages[k].player->color);
-        }
-    }
-}
 
 void Map::mousePressEvent(QMouseEvent * event)
 {
@@ -437,3 +471,5 @@ Unit * Map::unitOnCell(int cellx, int celly)
     }
     return NULL;
 }
+
+

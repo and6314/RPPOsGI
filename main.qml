@@ -6,6 +6,7 @@ import map 1.0
 import recruitment 1.0
 import toppanel 1.0
 import rightpanel 1.0
+import game 1.0
 
 ApplicationWindow {
     id: root
@@ -13,6 +14,18 @@ ApplicationWindow {
     height: 800
     visible: true
     color: "#000033"
+    Game {
+        id: game
+        m: map
+        Component.onCompleted:
+        {
+            newGame()
+            gamearea.visible = true
+            maparea.contentWidth  = (map.sizeX+1) * 64
+            maparea.contentHeight = (map.sizeY+1) * 64
+        }
+    }
+
     MyButton {
         id : turnButton
         onClicked:
@@ -24,6 +37,14 @@ ApplicationWindow {
         x : 1050
         y:650
         width:rightPanel.width
+        Text {
+
+            color: "white"
+            font.family: "Helvetica"
+            font.pointSize: 12
+            text: "Конец хода"
+            anchors.centerIn: parent
+        }
     }
     TopPanel {
         id:topPanel
@@ -46,6 +67,7 @@ ApplicationWindow {
     Rectangle
     {
         id : gamearea
+        visible: false
         x:5
         y:35
         border {
@@ -75,14 +97,15 @@ ApplicationWindow {
                     width: gamearea.width
                     height: gamearea.height
                     onClicked: {
-                        map.setLastxy(mouseX,mouseY)
                         if (!map.rercActive){
                             if (mouse.button == Qt.RightButton && map.isFocusEmpty()&&map.isCellEmpty(mouseX,mouseY)&&
                                     map.isRecrPoss(mouseX,mouseY))
                             {
-
+                                map.setLastxy(mouseX,mouseY)
                                 recr.visible = true
                                 map.rercActive = true
+                                maparea.interactive = false
+
                             }
 
                             map.mouseClicked(mouseX,mouseY,mouse.button)
@@ -92,7 +115,7 @@ ApplicationWindow {
                     }
                 }
                 onVictory: {
-
+                    game.endGame()
                     gamearea.visible = false
                     rightPanel.visible = false
                     topPanel.visible = false
@@ -181,6 +204,7 @@ ApplicationWindow {
                 map.rercActive = false
                 recr.visible = false
                 topPanel.update()
+                maparea.interactive = true
             }
         }
         Button {
@@ -192,6 +216,7 @@ ApplicationWindow {
             onClicked: {
                 map.rercActive = false
                 recr.visible = false
+                maparea.interactive = true
             }
 
         }
@@ -199,8 +224,5 @@ ApplicationWindow {
     VictoryScreen {
         id: victoryScreen
         visible: false
-
-
-
     }
 }

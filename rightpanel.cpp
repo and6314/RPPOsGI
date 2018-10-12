@@ -12,6 +12,7 @@ void RightPanel::paint(QPainter *painter)
 
     if (this->m!=NULL)
     {
+        if (m->gameInProgress) {
         painter->fillRect(30,30,width()-60,width()-60,m->activePlayer->color);
         painter->drawPixmap(30,30,m->activePlayer->flag);
         if (!m->isFocusEmpty())
@@ -35,7 +36,7 @@ void RightPanel::paint(QPainter *painter)
                               Qt::AlignLeft,"Здоровье : "+QString::number(m->focus.infocus->getHp())+"/"+QString::number(m->focus.infocus->type->getNorm_hp()));
 
         }
-    }
+    }}
 }
 
 Map *RightPanel::map()

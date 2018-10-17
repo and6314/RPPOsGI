@@ -8,7 +8,7 @@ Map::Map(QQuickItem *parent) :
     gameInProgress = false;
     activePlayer =NULL;
     this->unittypes.append(UnitType(0,Tzinch_cult,"Культист","мясо", ":/images/units/111.png",
-                                    100,2,2,50,5,4,20,1,40));
+                                    100,2,2,50,5,4,20,1,10));
     this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/images/units/112.png",
                                     500,4,3,500,25,44,80,3,99999));
     unittypes[1].specialfeatures.append("lord");
@@ -16,11 +16,11 @@ Map::Map(QQuickItem *parent) :
                                     500,4,3,500,25,44,80,3,99999));
     unittypes[2].specialfeatures.append("lord");
     this->unittypes.append(UnitType(3,O_Hereticus,"Ополченец","легкая пехота", ":/images/units/114.png",
-                                    180,2,2,50,5,4,20,1,60));
+                                    180,2,2,50,5,4,20,1,15));
     this->unittypes.append(UnitType(4,O_Hereticus,"Лучник","стрелок", ":/images/units/116.png",
-                                    100,2,2,50,5,4,20,4,80));
+                                    100,2,2,50,5,4,20,4,30));
     this->unittypes.append(UnitType(5,Tzinch_cult,"мутант","рубака", ":/images/units/115.png",
-                                    250,2,3,50,8,6,20,1,80));
+                                    250,2,3,50,8,6,20,1,30));
     /*UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
          double n_hp, int n_ap, double n_mp, double n_mor, double off,
          double def, double damage, int attackR,int cost)*/
@@ -66,6 +66,8 @@ void Map::paint(QPainter *painter)
             painter->drawText(QRectF(tx, ty, 64, 64),
                               Qt::AlignCenter,
                               QString::number(i)+":"+QString::number(j));
+            painter->setPen(QColor(255, 255, 255, 60));
+            painter->drawRect(tx,ty,64,64);
             if (!focus.isEmpty())
                 if (occupancy[i][j] == false)
                     if (pow(64*(focus.infocus->getCellx()- startcol) - tx,2) +
@@ -202,7 +204,7 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
 void Map::newturn()
 {
     ++turnNum;
-    activePlayer->cash += activePlayer->villages * 5 - activePlayer->units;
+    activePlayer->cash += 10 + activePlayer->villages * 5 - activePlayer->units;
     for (int i=0;i<units.length();++i)
     {
         if (units[i].player == activePlayer)
@@ -240,6 +242,8 @@ void Map::newturn()
             }
         }
     }
+    if (activePlayer->person == Comp)
+        emit aiturn();
 
     this->update();
 
@@ -326,6 +330,42 @@ void Map::clear()
     players.clear();
     sizeX =0;sizeY =0;m_cx=0;m_cy=0;turnNum = 0;
     activePlayer =NULL;
+    focus.clear();
+}
+
+QList <QPoint> Map::path(QPoint cell1,QPoint cell2)
+{
+    qDebug();
+    QList <QPoint> path;
+    QPoint p1 = QPoint(cell1.x()*64+32,cell1.y()*64+32);
+    QPoint p2 = QPoint(cell2.x()*64+32,cell2.y()*64+32);
+    int x1 = cell1.x() < cell2.x() ? cell1.x() : cell2.x();
+    int x2 = cell1.x() > cell2.x() ? cell1.x() : cell2.x();
+    int y1 = cell1.y() < cell2.y() ? cell1.y() : cell2.y();
+    int y2 = cell1.y() > cell2.y() ? cell1.y() : cell2.y();
+    for (int x=x1*64;x<x2*64;x+=8)
+    {
+        int y=(int)((x-p1.x())/((double)(p2.x()-p1.x()))*(p2.y()-p1.y())+p1.y());
+        if (!path.contains(QPoint(x/64,y/64)))
+            path.append(QPoint(x/64,y/64));
+    }
+    for (int y=y1*64;y<y2*64;y+=8)
+    {
+        int x=(int)((y-p1.y())/((double)(p2.y()-p1.y()))*(p2.x()-p1.x())+p1.x());
+        if (!path.contains(QPoint(x/64,y/64)))
+            path.append(QPoint(x/64,y/64));
+    }
+    return path;
+}
+
+void Map::aiVictory()
+{
+    emit defeat();
+}
+
+double Map::distance(int cellx1, int celly1, int cellx2, int celly2)
+{
+    return sqrt(pow(cellx1 - cellx2,2) + pow(celly1 - celly2,2));
 }
 
 int ** Map::getMapArr()
@@ -435,12 +475,6 @@ void Map::setLastxy(double ls,double ly)
     lasty = ly;
 }
 
-
-void Map::mousePressEvent(QMouseEvent * event)
-{
-    qDebug()<<"event->x()";
-}
-
 bool Map::isRecrPoss(int x, int y)
 {
     int startcol = qFloor(m_cx / 64);
@@ -468,6 +502,16 @@ Unit * Map::unitOnCell(int cellx, int celly)
     {
         if (units[i].getCellx() == cellx && units[i].getCelly() == celly)
             return &units[i];
+    }
+    return NULL;
+}
+
+Village * Map::villageUnCell(QPoint cell)
+{
+    for (int i=0; i < villages.length();++i)
+    {
+        if (villages[i].cellx == cell.x() && villages[i].celly == cell.y())
+            return &villages[i];
     }
     return NULL;
 }

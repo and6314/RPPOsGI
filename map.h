@@ -59,6 +59,7 @@ public:
     Q_INVOKABLE void setLastxy(double ls,double ly);
     Q_INVOKABLE QString getFocus();
     Unit *unitOnCell(int cellx, int celly);
+    Village *villageUnCell(QPoint cell);
     void distributePlayers();
     void readMap(QString filename);
     double lastx;
@@ -66,8 +67,12 @@ public:
     bool gameInProgress;
     bool **occupancy;   //true if cell is occupied
     void clear();
+    double distance(int cellx1, int celly1, int cellx2, int celly2);
+    QList <QPoint> path(QPoint cell1,QPoint cell2);
+    void aiVictory();
 
 signals:
+    void aiturn();
     void cxChanged(double cx);
     void cyChanged(double cy);
     void mapArrChanged();
@@ -75,6 +80,7 @@ signals:
     void sizeYChanged();
     void activePlayerChanged();
     void victory();
+    void defeat();
 
 
 public slots:
@@ -89,12 +95,7 @@ private:
     double m_cx;
     double m_cy;
     int turnNum;
-
     bool rercActive;
-
-
-protected:
-    void mousePressEvent(QMouseEvent * event);
 
 
 };

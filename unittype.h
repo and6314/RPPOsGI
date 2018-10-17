@@ -37,6 +37,7 @@ public:
     void setNorm_morale(double n);
     double getNorm_morale();
     int getAttackRadius();
+    bool operator==(const UnitType& arg);
 
 private:
     int id;

@@ -4,12 +4,13 @@ Player::Player()
 {
 
 }
-Player::Player(int id, Fraction f, QColor col, QString flagsource)
+Player::Player(int id, Fraction f,Person p, QColor col, QString flagsource)
 {
     fraction = f;
     this->id = id;
+    person = p;
     color = col;
-    cash = 100;
+    cash = 250;
     villages = 0;
     units = 0;
     flag = QPixmap(flagsource);

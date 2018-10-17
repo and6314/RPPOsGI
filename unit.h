@@ -40,6 +40,8 @@ public:
     bool attack(Unit *target); //возвращает убита ли цель
     bool isAttackPossible(Unit *target);
     bool operator==(const Unit& arg);
+    bool operator<(const Unit arg);
+    bool operator>(const Unit arg);
     bool isMovementPossible(int **map, bool **occupancy, int cellx, int celly);
     void move(int **map, bool **occupancy, int cellx, int celly);
 

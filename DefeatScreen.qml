@@ -22,10 +22,19 @@ Item {
         Text
         {
             color: "white"
-            text: "Победа"
+            text: "Поражение"
             font.family: "Helvetica"
             font.pointSize: 18
-            x :parent.width / 2 - 40
+            x :parent.width / 2 - 60
+            y :parent.height /2 - 290
+        }
+        Text
+        {
+            color: "white"
+            text: "В следующий раз повезет"
+            font.family: "Helvetica"
+            font.pointSize: 12
+            x :parent.width / 2 - 80
             y :parent.height /2 - 260
         }
         MyButton {
@@ -41,7 +50,7 @@ Item {
             }
             onClicked:
             {
-                victoryScreen.visible = false
+                defeatScreen.visible = false
                 game.newGame()
                 gamearea.visible = true
                 rightPanel.visible = true

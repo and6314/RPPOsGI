@@ -6,7 +6,7 @@
 #include <QColor>
 #include <QPixmap>
 
-enum Person{Man,AI};
+enum Person{Man,Comp};
 
 class Player
 {

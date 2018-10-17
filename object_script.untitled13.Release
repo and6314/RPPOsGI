@@ -11,6 +11,7 @@ INPUT(
 ./release\village.o
 ./release\toppanel.o
 ./release\rightpanel.o
+./release\ai.o
 ./release\qrc_qml.o
 ./release\moc_backend.o
 ./release\moc_map.o

@@ -45,6 +45,7 @@ ApplicationWindow {
             text: "Конец хода"
             anchors.centerIn: parent
         }
+
     }
     TopPanel {
         id:topPanel
@@ -121,6 +122,17 @@ ApplicationWindow {
                     topPanel.visible = false
                     turnButton.visible = false
                     victoryScreen.visible = true
+                }
+                onDefeat: {
+                    game.endGame()
+                    gamearea.visible = false
+                    rightPanel.visible = false
+                    topPanel.visible = false
+                    turnButton.visible = false
+                    defeatScreen.visible = true
+                }
+                onAiturn: {
+                    game.ait()
                 }
             }
 
@@ -223,6 +235,10 @@ ApplicationWindow {
     }
     VictoryScreen {
         id: victoryScreen
+        visible: false
+    }
+    DefeatScreen {
+        id: defeatScreen
         visible: false
     }
 }

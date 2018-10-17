@@ -10,7 +10,7 @@ Player::Player(int id, Fraction f,Person p, QColor col, QString flagsource)
     this->id = id;
     person = p;
     color = col;
-    cash = 100;
+    cash = 250;
     villages = 0;
     units = 0;
     flag = QPixmap(flagsource);

@@ -42,6 +42,20 @@ bool Unit::operator==(const Unit& arg)
     return false;
 }
 
+bool Unit::operator<(const Unit arg)
+{
+    if (this->cellx != arg.cellx && this->celly != arg.celly)
+        return true;
+    return false;
+}
+
+bool Unit::operator>(const Unit arg)
+{
+    if (this->cellx != arg.cellx && this->celly != arg.celly)
+        return true;
+    return false;
+}
+
 void Unit::setHp(double hp)
 {
     this->hp = hp;
@@ -147,6 +161,12 @@ bool Unit::isAttackPossible(Unit *target)
     {
         if (target->player!=this->player && this->getAp()>0)
         {
+            if (this->type->getAttackRadius()==1)
+                if (target->getCellx() >= this->getCellx()-1
+                        && target->getCellx() <= this->getCellx()+1
+                        && target->getCelly() >= this->getCelly()-1
+                        && target->getCelly() <= this->getCelly()+1)
+                    return true;
             if ((qCeil(sqrt(pow((this->getCellx()- target->getCellx()) ,2) +
                             pow((this->getCelly()) - target->getCelly(),2)))
                  <=this->type->getAttackRadius()))

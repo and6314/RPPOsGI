@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     recruitment.cpp \
     village.cpp \
     toppanel.cpp \
-    rightpanel.cpp
+    rightpanel.cpp \
+    ai.cpp
 
 RESOURCES += qml.qrc
 
@@ -51,4 +52,5 @@ HEADERS += \
     recruitment.h \
     village.h \
     toppanel.h \
-    rightpanel.h
+    rightpanel.h \
+    ai.h

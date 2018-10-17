@@ -20,5 +20,6 @@
         <file>maps/map1.txt</file>
         <file>maps/map2.txt</file>
         <file>maps/map3.txt</file>
+        <file>DefeatScreen.qml</file>
     </qresource>
 </RCC>

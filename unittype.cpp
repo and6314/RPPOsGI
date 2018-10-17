@@ -25,6 +25,13 @@ UnitType::UnitType(int type_id,Fraction f, QString name, QString descr, QString 
     this->cost = cost;
 }
 
+bool UnitType::operator==(const UnitType& arg)
+{
+    if (this->id == arg.id)
+        return true;
+    return false;
+}
+
 void UnitType::setName(QString n)
 {
     this->name = n;

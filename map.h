@@ -75,6 +75,7 @@ public:
     double distance(int cellx1, int celly1, int cellx2, int celly2);
     QList <QPoint> path(QPoint cell1,QPoint cell2);
     void aiVictory();
+    void playerVictory();
     QList <QPoint> sortByDistance(QList <QPoint> l, QPoint p);
     void passiveAbilitiesAction();
 

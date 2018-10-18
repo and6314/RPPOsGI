@@ -64,7 +64,6 @@ void Map::paint(QPainter *painter)
 
     if (gameInProgress)
     {
-
     QPen pen = QPen();
     int startcol = qFloor(m_cx / 64);
     int startrow = qFloor(m_cy / 64);
@@ -158,6 +157,23 @@ void Map::paint(QPainter *painter)
         painter->drawLine(sx+50,sy+40,sx+50,sy+55);
         painter->fillRect(sx+50,sy+40,10,5,units[i].player->color);
         painter->drawPixmap(sx, sy, sprite);
+        if (units[i].player == activePlayer)
+        {
+            for (int j=0;j<units[i].getMp();++j)
+            {
+                pen.setColor(QColor(0,255,0));
+                pen.setWidth(3);
+                painter->setPen(pen);
+                painter->drawEllipse(QPoint(sx+4,sy+7+7*j),2,2);
+            }
+            for (int j=0;j<units[i].getAp();++j)
+            {
+                pen.setColor(QColor(255,0,0));
+                pen.setWidth(3);
+                painter->setPen(pen);
+                painter->drawEllipse(QPoint(sx+12,sy+7+7*j),2,2);
+            }
+        }
     }
     for (int k=0;k<villages.length();++k)
     {
@@ -391,6 +407,13 @@ void Map::aiVictory()
 
     emit defeat();
 }
+
+void Map::playerVictory()
+{
+
+    emit victory();
+}
+
 
 double Map::distance(int cellx1, int celly1, int cellx2, int celly2)
 {

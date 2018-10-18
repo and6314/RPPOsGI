@@ -1,5 +1,6 @@
 #ifndef RIGHTPANEL_H
 #define RIGHTPANEL_H
+
 #include <QObject>
 #include <QQuickItem>
 #include <QQuickPaintedItem>

@@ -38,7 +38,9 @@ public:
     int getCelly();
     bool isFocusEmpty();
     bool attack(Unit *target); //возвращает убита ли цель
+    bool attack(Unit *target, AttackType atc);
     bool isAttackPossible(Unit *target);
+    bool isAttackPossible(Unit *target,AttackType atc);
     bool operator==(const Unit& arg);
     bool operator<(const Unit arg);
     bool operator>(const Unit arg);

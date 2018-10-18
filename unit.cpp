@@ -149,7 +149,22 @@ int Unit::getCelly()
 bool Unit::attack(Unit *target)
 {
     this->setAp(this->getAp()-1);
-    target->setHp(target->getHp()-this->type->getDamage());
+    QList <AttackType> availableAttacks;
+    for (int i=0;i<type->attacks.length();++i)
+        if (isAttackPossible(target,type->attacks[i]))
+            availableAttacks.append(type->attacks[i]);
+    if (qrand()&101 >= availableAttacks[0].chance)
+        target->setHp(target->getHp()-availableAttacks[0].damage);
+    if (target->getHp()<=0)
+        return true;
+    return false;
+}
+
+bool Unit::attack(Unit *target, AttackType atc)
+{
+    this->setAp(this->getAp()-1);
+    if (qrand()&101 >= atc.chance)
+        target->setHp(target->getHp()-atc.damage);
     if (target->getHp()<=0)
         return true;
     return false;
@@ -170,6 +185,27 @@ bool Unit::isAttackPossible(Unit *target)
             if ((qCeil(sqrt(pow((this->getCellx()- target->getCellx()) ,2) +
                             pow((this->getCelly()) - target->getCelly(),2)))
                  <=this->type->getAttackRadius()))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool Unit::isAttackPossible(Unit *target,AttackType atc)
+{
+    if (target!=NULL)
+    {
+        if (target->player!=this->player && this->getAp()>0)
+        {
+            if (atc.attackRadius==1)
+                if (target->getCellx() >= this->getCellx()-1
+                        && target->getCellx() <= this->getCellx()+1
+                        && target->getCelly() >= this->getCelly()-1
+                        && target->getCelly() <= this->getCelly()+1)
+                    return true;
+            if ((qCeil(sqrt(pow((this->getCellx()- target->getCellx()) ,2) +
+                            pow((this->getCelly()) - target->getCelly(),2)))
+                 <=atc.attackRadius))
                 return true;
         }
     }

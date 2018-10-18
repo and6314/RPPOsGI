@@ -7,6 +7,7 @@ import recruitment 1.0
 import toppanel 1.0
 import rightpanel 1.0
 import game 1.0
+import attackpanel 1.0
 
 ApplicationWindow {
     id: root
@@ -108,7 +109,15 @@ ApplicationWindow {
                                 maparea.interactive = false
 
                             }
+                            if (mouse.button == Qt.RightButton && !map.isFocusEmpty()&&!map.isCellEmpty(mouseX,mouseY)&&
+                                    map.isAtckPoss(mouseX,mouseY))
+                            {
+                                map.setLastxy(mouseX,mouseY)
+                                atck.visible = true
+                                map.rercActive = true
+                                maparea.interactive = false
 
+                            }
                             map.mouseClicked(mouseX,mouseY,mouse.button)
                             topPanel.update()
                             rightPanel.update()
@@ -228,6 +237,102 @@ ApplicationWindow {
             onClicked: {
                 map.rercActive = false
                 recr.visible = false
+                maparea.interactive = true
+            }
+
+        }
+    }
+    Rectangle {
+        id : atck
+        onVisibleChanged: {
+            content_a.update()
+        }
+
+        visible: false
+        x:gamearea.width/2 -135
+        y:gamearea.height/2 -90
+        width: 270
+        height: 180
+        color: "#191D4A"
+
+        Rectangle {
+            id: attackframe
+            x:5
+            y:5
+
+
+            clip: true
+            width: 260
+            height: 140
+            border {
+                color: "grey"
+                width: 2
+
+            }
+            color: "#003366"
+
+
+            AttackPanel {
+                id : content_a
+                m : map
+                width : 260;
+                height : 64*4
+                x: -hbar_a.position * width
+                y: -vbar_a.position * height
+            }
+
+            ScrollBar {
+                id: vbar_a
+                hoverEnabled: true
+                active: hovered || pressed
+                orientation: Qt.Vertical
+                size: attackframe.height / content_a.height
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+            }
+
+            ScrollBar {
+                id: hbar_a
+                hoverEnabled: true
+                active: hovered || pressed
+                orientation: Qt.Horizontal
+                size: attackframe.width / content_a.width
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+            }
+            MouseArea {
+                width : parent.width -10
+                height: parent.height -10
+                onClicked: content_a.mouseClicked(mouseX+hbar_a.position * content_a.width,mouseY+vbar_a.position * content_a.height)
+            }
+        }
+        Button {
+            id : btn2
+            x :10
+            y :150
+            width:100
+            height: 20
+            text: "Атаковать"
+            onClicked: {
+                content_a.acceptr()
+                map.rercActive = false
+                atck.visible = false
+                topPanel.update()
+                rightPanel.update()
+                maparea.interactive = true
+            }
+        }
+        Button {
+            x :120
+            y :150
+            width:100
+            height: 20
+            text: "Отмена"
+            onClicked: {
+                map.rercActive = false
+                atck.visible = false
                 maparea.interactive = true
             }
 

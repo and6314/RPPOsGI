@@ -15,6 +15,7 @@
 #include <QMouseEvent>
 #include <focus.h>
 #include <village.h>
+#include <attacktype.h>
 
 class Map : public QQuickPaintedItem
 {
@@ -36,9 +37,11 @@ public:
     QList<UnitType> unittypes;
     QList<Player> players;
     QList<Village> villages;
+    QList <AttackType> attackTypes;
     Player *activePlayer;
     Focus focus;
     Q_INVOKABLE bool isRecrPoss(int x, int y);
+    Q_INVOKABLE bool isAtckPoss(int x, int y);
     Q_INVOKABLE void start();
     Q_INVOKABLE void mouseClicked(int x, int y, Qt::MouseButtons);
     Q_INVOKABLE void newturn();

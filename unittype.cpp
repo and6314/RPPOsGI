@@ -7,7 +7,7 @@ UnitType::UnitType()
 
 UnitType::UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
          double n_hp, int n_ap, double n_mp, double n_mor, double off,
-         double def, double damage, int attackR,int cost)
+         double def, int attackR,int cost)
 {
     this->id = type_id;
     this->name = name;
@@ -19,7 +19,6 @@ UnitType::UnitType(int type_id,Fraction f, QString name, QString descr, QString 
     this->norm_morale = n_mor;
     this->off = off;
     this->def = def;
-    this->damage = damage;
     this->fraction =f;
     this->attackRadius = attackR;
     this->cost = cost;
@@ -117,16 +116,6 @@ void UnitType::setDef(int d)
     this->def = d;
 }
 
-double UnitType::getDamage()
-{
-    return this->damage;
-}
-
-void UnitType::setDamage(int d)
-{
-    this->damage = d;
-}
-
 void UnitType::setNorm_morale(double n)
 {
     this->norm_morale = n;
@@ -140,4 +129,13 @@ double UnitType::getNorm_morale()
 int UnitType::getAttackRadius()
 {
     return attackRadius;
+}
+
+int UnitType::getDamage()
+{
+    int md=0;
+    for (int i=0;i<attacks.length();++i)
+        if (attacks[i].damage>md)
+            md = attacks[i].damage;
+    return md;
 }

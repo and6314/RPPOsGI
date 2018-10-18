@@ -7,23 +7,39 @@ Map::Map(QQuickItem *parent) :
     rercActive = false;
     gameInProgress = false;
     activePlayer =NULL;
+    attackTypes.append(AttackType(0,"Меч",":/images/attacks/sword.png",30,1,60));
+    attackTypes.append(AttackType(1,"Лук",":/images/attacks/bow.png",30,3,40));
+    attackTypes.append(AttackType(2,"Варп огонь",":/images/attacks/dark-missile.png",40,3,50));
+    attackTypes.append(AttackType(3,"Варп огонь",":/images/attacks/fireball.png",40,3,50));
+    attackTypes.append(AttackType(4,"Посох",":/images/attacks/staff-inc.png",20,1,70));
+    attackTypes.append(AttackType(5,"Посох",":/images/attacks/staff-sorcerer.png",20,1,70));
+    attackTypes.append(AttackType(6,"Клыки",":/images/attacks/fangs.png",35,1,60));
+    attackTypes.append(AttackType(7,"Кинжал",":/images/attacks/dagger.png",15,1,50));
+    attackTypes.append(AttackType(8,"Нож",":/images/attacks/dagger-thrown.png",15,2,30));
     this->unittypes.append(UnitType(0,Tzinch_cult,"Культист","мясо", ":/images/units/111.png",
-                                    100,2,2,50,5,4,20,1,10));
+                                    100,2,2,50,5,4,1,10));
+    unittypes[0].attacks.append(attackTypes[0]);
     this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/images/units/112.png",
-                                    500,4,3,500,25,44,80,3,99999));
+                                    500,4,3,500,25,44,3,99999));
     unittypes[1].specialfeatures.append("lord");
+    unittypes[1].attacks.append(attackTypes[2]);unittypes[1].attacks.append(attackTypes[5]);
     this->unittypes.append(UnitType(2,O_Hereticus,"Инквизитор","командир", ":/images/units/113.png",
-                                    500,4,3,500,25,44,80,3,99999));
+                                    500,4,3,500,25,44,3,99999));
     unittypes[2].specialfeatures.append("lord");
+    unittypes[2].attacks.append(attackTypes[3]);unittypes[2].attacks.append(attackTypes[4]);
     this->unittypes.append(UnitType(3,O_Hereticus,"Ополченец","легкая пехота", ":/images/units/114.png",
-                                    180,2,2,50,5,4,20,1,15));
+                                    180,2,2,50,5,4,1,15));
+    unittypes[3].attacks.append(attackTypes[0]);
     this->unittypes.append(UnitType(4,O_Hereticus,"Лучник","стрелок", ":/images/units/116.png",
-                                    100,2,2,50,5,4,20,4,30));
+                                    100,2,2,50,5,4,3,30));
+    unittypes[4].attacks.append(attackTypes[1]);unittypes[4].attacks.append(attackTypes[7]);
     this->unittypes.append(UnitType(5,Tzinch_cult,"мутант","рубака", ":/images/units/115.png",
-                                    250,2,3,50,8,6,20,1,30));
+                                    250,2,3,50,8,6,1,30));
+    unittypes[5].attacks.append(attackTypes[6]);unittypes[5].attacks.append(attackTypes[8]);
     /*UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
          double n_hp, int n_ap, double n_mp, double n_mor, double off,
          double def, double damage, int attackR,int cost)*/
+
     turnNum = 0;
     connect(this, SIGNAL(xChanged()), this, SLOT(update()));
     connect(this, SIGNAL(yChanged()), this, SLOT(update())); 
@@ -177,24 +193,8 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
                 }
             }
         } else {
-            Unit *target = unitOnCell(nx+startcol, ny +startrow);
-            if (focus.infocus->isAttackPossible(target))
-            {
-                if (focus.infocus->attack(target))
-                {
-                    occupancy[target->getCellx()][target->getCelly()] = false;
-                    if (target->type->specialfeatures.contains("lord"))
-                    {
-                        Player p = *target->player;
-                        units.removeOne(*target);
-                        players.removeOne(p);
-                        if (players.length()==1)
-                            emit victory();
-                    }
-                    else
-                        units.removeOne(*target);
-                }
-            }
+            if (players.length()==1)
+                emit victory();
         }
     }
     this->update();
@@ -493,6 +493,18 @@ bool Map::isRecrPoss(int x, int y)
             }
         }
     }
+    return false;
+}
+
+bool Map::isAtckPoss(int x, int y)
+{
+    int startcol = qFloor(m_cx / 64);
+    int startrow = qFloor(m_cy / 64);
+    int nx = qFloor(x / 64);
+    int ny = qFloor(y / 64);
+    Unit *target = unitOnCell(nx+startcol,ny+startrow);
+    if (!focus.isEmpty()&&target!=NULL)
+        return focus.infocus->isAttackPossible(target);
     return false;
 }
 

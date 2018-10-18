@@ -15,7 +15,9 @@ SOURCES += main.cpp \
     village.cpp \
     toppanel.cpp \
     rightpanel.cpp \
-    ai.cpp
+    ai.cpp \
+    attacktype.cpp \
+    attackpanel.cpp
 
 RESOURCES += qml.qrc
 
@@ -53,4 +55,6 @@ HEADERS += \
     village.h \
     toppanel.h \
     rightpanel.h \
-    ai.h
+    ai.h \
+    attacktype.h \
+    attackpanel.h

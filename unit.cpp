@@ -148,8 +148,35 @@ int Unit::getCelly()
 
 bool Unit::attack(Unit *target)
 {
-    this->setAp(this->getAp()-1);
-    target->setHp(target->getHp()-this->type->getDamage());
+    QList <AttackType> availableAttacks;
+    for (int i=0;i<type->attacks.length();++i)
+        if (isAttackPossible(target,type->attacks[i]))
+            availableAttacks.append(type->attacks[i]);
+    while (this->ap!=0)
+    {
+        if (attack(target,availableAttacks[0]))
+            return true;
+    }
+}
+
+bool Unit::attack(Unit *target, AttackType atc)
+{
+    this->ap-=1;
+    int chn = atc.chance + (this->morale-50)/100*atc.chance;
+    chn = chn>=100 ? 99 : chn;
+    chn = chn<=0 ? 1 : chn;
+    if (qrand()&101 >= chn)
+    {
+        target->setHp(target->getHp()-atc.damage);
+        if(this->morale<=90)
+            this->morale+=10;
+        else
+            this->morale=100;
+        if (target->morale-(int)(atc.damage/target->type->getNorm_hp()*50)>=0)
+            target->morale-=(int)(atc.damage/target->type->getNorm_hp()*50);
+        else
+            target->morale=0;
+    }
     if (target->getHp()<=0)
         return true;
     return false;
@@ -170,6 +197,27 @@ bool Unit::isAttackPossible(Unit *target)
             if ((qCeil(sqrt(pow((this->getCellx()- target->getCellx()) ,2) +
                             pow((this->getCelly()) - target->getCelly(),2)))
                  <=this->type->getAttackRadius()))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool Unit::isAttackPossible(Unit *target,AttackType atc)
+{
+    if (target!=NULL)
+    {
+        if (target->player!=this->player && this->getAp()>0)
+        {
+            if (atc.attackRadius==1)
+                if (target->getCellx() >= this->getCellx()-1
+                        && target->getCellx() <= this->getCellx()+1
+                        && target->getCelly() >= this->getCelly()-1
+                        && target->getCelly() <= this->getCelly()+1)
+                    return true;
+            if ((qCeil(sqrt(pow((this->getCellx()- target->getCellx()) ,2) +
+                            pow((this->getCelly()) - target->getCelly(),2)))
+                 <=atc.attackRadius))
                 return true;
         }
     }

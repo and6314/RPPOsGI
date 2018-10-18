@@ -31,7 +31,7 @@ void RightPanel::paint(QPainter *painter)
             painter->drawText(QRectF(30, width()+120, 250, 25),
                               Qt::AlignLeft,"Радиус атаки : "+QString::number(m->focus.infocus->type->getAttackRadius()));
             painter->drawText(QRectF(30, width()+150, 250, 25),
-                              Qt::AlignLeft,"Урон : "+QString::number(m->focus.infocus->type->getDamage()));
+                              Qt::AlignLeft,"Мораль : "+QString::number(m->focus.infocus->getMorale()));
             painter->drawText(QRectF(30, width()+180, 250, 25),
                               Qt::AlignLeft,"Здоровье : "+QString::number(m->focus.infocus->getHp())+"/"+QString::number(m->focus.infocus->type->getNorm_hp()));
 

@@ -12,6 +12,8 @@ INPUT(
 ./debug\toppanel.o
 ./debug\rightpanel.o
 ./debug\ai.o
+./debug\attacktype.o
+./debug\attackpanel.o
 ./debug\qrc_qml.o
 ./debug\moc_backend.o
 ./debug\moc_map.o
@@ -19,4 +21,5 @@ INPUT(
 ./debug\moc_recruitment.o
 ./debug\moc_toppanel.o
 ./debug\moc_rightpanel.o
+./debug\moc_attackpanel.o
 );

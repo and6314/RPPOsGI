@@ -1,17 +1,18 @@
-#ifndef RECRUITMENT_H
-#define RECRUITMENT_H
+#ifndef ATTACKPANEL_H
+#define ATTACKPANEL_H
 
 #include <QObject>
 #include <QQuickItem>
 #include <QQuickPaintedItem>
 #include "map.h"
 
-class Recruitment: public QQuickPaintedItem
+class AttackPanel: public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(Map *m READ map WRITE setMap NOTIFY mapChanged)
+
 public:
-    Recruitment(QQuickItem *parent  = nullptr);
+    AttackPanel(QQuickItem *parent  = nullptr);
     void paint(QPainter *painter);
     Q_INVOKABLE void mouseClicked(int x, int y);
     Q_INVOKABLE void acceptr();
@@ -24,9 +25,10 @@ signals:
 
 private:
     QMap<QString, QPixmap> spriteCache;
-    UnitType *focus;
+    AttackType *focus;
     QMap<int, int>rel;
     Map *m;
+
 };
 
-#endif // RECRUITMENT_H
+#endif // ATTACKPANEL_H

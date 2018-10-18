@@ -2,6 +2,7 @@
 #define UNITTYPE_H
 #include <QString>
 #include <QObject>
+#include <attacktype.h>
 
 enum Fraction {O_Hereticus, Tzinch_cult};
 
@@ -11,7 +12,7 @@ public:
     UnitType();
     UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
              double n_hp, int n_ap, double n_mp, double n_mor, double off,
-             double def, double damage, int attackR,int cost);
+             double def, int attackR,int cost);
     Fraction fraction;
     QList<QString> specialfeatures;
     int cost;
@@ -32,12 +33,12 @@ public:
     void setOff(double o);
     double getDef();
     void setDef(int d);
-    double getDamage();
-    void setDamage(int d);
     void setNorm_morale(double n);
     double getNorm_morale();
     int getAttackRadius();
     bool operator==(const UnitType& arg);
+    QList <AttackType> attacks;
+    int getDamage();
 
 private:
     int id;
@@ -49,7 +50,6 @@ private:
     int norm_ap;
     double off;
     double def;
-    double damage;
     double norm_morale;
     int attackRadius; //in cells
 };

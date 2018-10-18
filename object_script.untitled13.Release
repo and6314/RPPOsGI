@@ -12,6 +12,8 @@ INPUT(
 ./release\toppanel.o
 ./release\rightpanel.o
 ./release\ai.o
+./release\attacktype.o
+./release\attackpanel.o
 ./release\qrc_qml.o
 ./release\moc_backend.o
 ./release\moc_map.o
@@ -19,4 +21,5 @@ INPUT(
 ./release\moc_recruitment.o
 ./release\moc_toppanel.o
 ./release\moc_rightpanel.o
+./release\moc_attackpanel.o
 );

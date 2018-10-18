@@ -26,8 +26,7 @@ void Recruitment::paint(QPainter *painter)
             if (m->unittypes[i].fraction == m->activePlayer->fraction &&
                     m->activePlayer->cash >= m->unittypes[i].cost)
             {
-                if (focus==NULL || focus->fraction != m->activePlayer->fraction
-                        || m->activePlayer->cash <= focus->cost)
+                if (focus==NULL)
                     focus=&m->unittypes[i];
 
                 if(spriteCache.contains(m->unittypes[i].getImSorce())) {
@@ -48,7 +47,6 @@ void Recruitment::paint(QPainter *painter)
                                   Qt::AlignLeft,m->unittypes[i].getDescription());
                 painter->drawText(QRectF(80, 40+n*100, 200, 15),
                                   Qt::AlignLeft,"Цена : " + QString::number(m->unittypes[i].cost));
-                if (focus!=NULL)
                 if (focus->getid() == m->unittypes[i].getid())
                 {
                     painter->setPen(QColor(225, 255, 255));

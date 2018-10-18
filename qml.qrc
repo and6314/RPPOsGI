@@ -21,5 +21,14 @@
         <file>maps/map2.txt</file>
         <file>maps/map3.txt</file>
         <file>DefeatScreen.qml</file>
+        <file>images/attacks/bow.png</file>
+        <file>images/attacks/dark-missile.png</file>
+        <file>images/attacks/fireball.png</file>
+        <file>images/attacks/staff-inc.png</file>
+        <file>images/attacks/staff-sorcerer.png</file>
+        <file>images/attacks/sword.png</file>
+        <file>images/attacks/fangs.png</file>
+        <file>images/attacks/dagger.png</file>
+        <file>images/attacks/dagger-thrown.png</file>
     </qresource>
 </RCC>

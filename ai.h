@@ -29,7 +29,7 @@ private:
     int enemiesNearby(Unit *u,int r);
     int friendsNearby(Unit *u,int r);
     void moveInDirection(Unit *u, QPoint p);
-    QList <QPoint> sortByDistance(QList <QPoint> l, QPoint p);
+
     QList <Unit> m_units;
     QList <Unit> enemyunits;
     QList <UnitType> fractionUnitTypes;

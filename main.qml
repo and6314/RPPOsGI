@@ -9,6 +9,7 @@ import rightpanel 1.0
 import game 1.0
 import attackpanel 1.0
 import menu 1.0
+import passiveabilitiespanel 1.0
 
 ApplicationWindow {
     id: root
@@ -33,10 +34,12 @@ ApplicationWindow {
                 turnButton.visible = true
                 topPanel.visible = true
                 rightPanel.visible = true
-
+                passiveAbilitiesPanel.visible =true
+                topPanel.update()
+                rightPanel.update()
             }
             x : 1050
-            y:650
+            y:685
             width:300
             Text {
 
@@ -53,13 +56,6 @@ ApplicationWindow {
     Game {
         id: game
         m: map
-        /*Component.onCompleted:
-        {
-            newGame()
-            gamearea.visible = true
-            maparea.contentWidth  = (map.sizeX+1) * 64
-            maparea.contentHeight = (map.sizeY+1) * 64
-        }*/
     }
 
     MyButton {
@@ -72,7 +68,7 @@ ApplicationWindow {
             rightPanel.update()
         }
         x : 1050
-        y:650
+        y:685
         width:rightPanel.width
         Text {
 
@@ -100,7 +96,16 @@ ApplicationWindow {
         x :1050
         y:5
         width : 300
-        height: 600
+        height: 520
+        m:map
+    }
+    PassiveAbilitiesPanel {
+        id: passiveAbilitiesPanel
+        visible: false
+        x :1050
+        y:535
+        width : 300
+        height: 140
         m:map
     }
 
@@ -159,6 +164,7 @@ ApplicationWindow {
                             map.mouseClicked(mouseX,mouseY,mouse.button)
                             topPanel.update()
                             rightPanel.update()
+                            passiveAbilitiesPanel.update()
                         }
                     }
                 }
@@ -172,11 +178,13 @@ ApplicationWindow {
                 }
                 onDefeat: {
                     game.endGame()
+                    defeatScreen.visible = true
                     gamearea.visible = false
                     rightPanel.visible = false
                     topPanel.visible = false
                     turnButton.visible = false
-                    defeatScreen.visible = true
+
+
                 }
                 onAiturn: {
                     game.ait()

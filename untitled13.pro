@@ -18,7 +18,9 @@ SOURCES += main.cpp \
     ai.cpp \
     attacktype.cpp \
     attackpanel.cpp \
-    menu.cpp
+    menu.cpp \
+    passiveability.cpp \
+    passiveabilitiespanel.cpp
 
 RESOURCES += qml.qrc
 
@@ -59,4 +61,6 @@ HEADERS += \
     ai.h \
     attacktype.h \
     attackpanel.h \
-    menu.h
+    menu.h \
+    passiveability.h \
+    passiveabilitiespanel.h

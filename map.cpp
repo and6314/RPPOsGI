@@ -20,11 +20,11 @@ Map::Map(QQuickItem *parent) :
                                     100,2,2,50,5,4,1,10));
     unittypes[0].attacks.append(attackTypes[0]);
     this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/images/units/112.png",
-                                    500,4,3,500,25,44,3,99999));
+                                    500,4,3,50,25,44,3,99999));
     unittypes[1].specialfeatures.append("lord");
     unittypes[1].attacks.append(attackTypes[2]);unittypes[1].attacks.append(attackTypes[5]);
     this->unittypes.append(UnitType(2,O_Hereticus,"Инквизитор","командир", ":/images/units/113.png",
-                                    500,4,3,500,25,44,3,99999));
+                                    500,4,3,50,25,44,3,99999));
     unittypes[2].specialfeatures.append("lord");
     unittypes[2].attacks.append(attackTypes[3]);unittypes[2].attacks.append(attackTypes[4]);
     this->unittypes.append(UnitType(3,O_Hereticus,"Ополченец","легкая пехота", ":/images/units/114.png",
@@ -134,6 +134,10 @@ void Map::paint(QPainter *painter)
         pen.setWidth(1);
         painter->setPen(pen);
         painter->drawRect(sx+7,sy+55,50.0f*(units[i].type->getNorm_hp()/600),4);
+        painter->fillRect(sx+7,sy+60,units[i].getMorale()/2,4,QColor(0, 255, 255));
+        pen.setColor(QColor(0,255,255));
+        painter->setPen(pen);
+        painter->drawRect(sx+7,sy+60,50,4);
         pen.setColor(units[i].player->color);
         pen.setWidth(2);
         painter->setPen(pen);
@@ -212,9 +216,14 @@ void Map::newturn()
             units[i].setAp(units[i].type->getNorm_ap());
             units[i].setMp(units[i].type->getNorm_mp());
             if (units[i].getHp() < units[i].type->getNorm_hp())
-                units[i].setHp(units[i].getHp()+qFloor(units[i].type->getNorm_hp()/10));
+                units[i].setHp(units[i].getHp()+qCeil(units[i].type->getNorm_hp()/20));
             if (units[i].getHp() > units[i].type->getNorm_hp())
                 units[i].setHp(units[i].type->getNorm_hp());
+            if (units[i].getMorale()>50)
+                units[i].setMorale(units[i].getMorale()-2);
+            else
+                if (units[i].getMorale()<50)
+                units[i].setMorale(units[i].getMorale()+2);
         }
 
     }

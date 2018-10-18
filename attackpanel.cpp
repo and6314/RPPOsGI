@@ -40,8 +40,11 @@ void AttackPanel::paint(QPainter *painter)
                                   Qt::AlignLeft,m->focus.infocus->type->attacks[i].name);
                 painter->drawText(QRectF(80, 25+n*100, 200, 15),
                                   Qt::AlignLeft,"Урон: "+QString::number(m->focus.infocus->type->attacks[i].damage));
+                int chn = m->focus.infocus->type->attacks[i].chance + (m->focus.infocus->getMorale()-50)/100*m->focus.infocus->type->attacks[i].chance;
+                chn = chn>=100 ? 99 : chn;
+                chn = chn<=0 ? 1 : chn;
                 painter->drawText(QRectF(80, 40+n*100, 200, 15),
-                                  Qt::AlignLeft,"Шанс попадания: " + QString::number(m->focus.infocus->type->attacks[i].chance));
+                                  Qt::AlignLeft,"Шанс попадания: " + QString::number(chn));
                 if (focus->id == m->focus.infocus->type->attacks[i].id)
                 {
                     painter->setPen(QColor(225, 255, 255));

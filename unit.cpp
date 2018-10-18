@@ -148,23 +148,35 @@ int Unit::getCelly()
 
 bool Unit::attack(Unit *target)
 {
-    this->setAp(this->getAp()-1);
     QList <AttackType> availableAttacks;
     for (int i=0;i<type->attacks.length();++i)
         if (isAttackPossible(target,type->attacks[i]))
             availableAttacks.append(type->attacks[i]);
-    if (qrand()&101 >= availableAttacks[0].chance)
-        target->setHp(target->getHp()-availableAttacks[0].damage);
-    if (target->getHp()<=0)
-        return true;
-    return false;
+    while (this->ap!=0)
+    {
+        if (attack(target,availableAttacks[0]))
+            return true;
+    }
 }
 
 bool Unit::attack(Unit *target, AttackType atc)
 {
-    this->setAp(this->getAp()-1);
-    if (qrand()&101 >= atc.chance)
+    this->ap-=1;
+    int chn = atc.chance + (this->morale-50)/100*atc.chance;
+    chn = chn>=100 ? 99 : chn;
+    chn = chn<=0 ? 1 : chn;
+    if (qrand()&101 >= chn)
+    {
         target->setHp(target->getHp()-atc.damage);
+        if(this->morale<=90)
+            this->morale+=10;
+        else
+            this->morale=100;
+        if (target->morale-(int)(atc.damage/target->type->getNorm_hp()*50)>=0)
+            target->morale-=(int)(atc.damage/target->type->getNorm_hp()*50);
+        else
+            target->morale=0;
+    }
     if (target->getHp()<=0)
         return true;
     return false;

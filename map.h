@@ -16,6 +16,7 @@
 #include <focus.h>
 #include <village.h>
 #include <attacktype.h>
+#include <passiveability.h>
 
 class Map : public QQuickPaintedItem
 {
@@ -37,7 +38,8 @@ public:
     QList<UnitType> unittypes;
     QList<Player> players;
     QList<Village> villages;
-    QList <AttackType> attackTypes;
+    QList<AttackType> attackTypes;
+    QList<PassiveAbility> passiveAbilities;
     Player *activePlayer;
     Focus focus;
     Q_INVOKABLE bool isRecrPoss(int x, int y);
@@ -73,6 +75,8 @@ public:
     double distance(int cellx1, int celly1, int cellx2, int celly2);
     QList <QPoint> path(QPoint cell1,QPoint cell2);
     void aiVictory();
+    QList <QPoint> sortByDistance(QList <QPoint> l, QPoint p);
+    void passiveAbilitiesAction();
 
 signals:
     void aiturn();

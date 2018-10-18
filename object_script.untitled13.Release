@@ -15,6 +15,7 @@ INPUT(
 ./release\attacktype.o
 ./release\attackpanel.o
 ./release\menu.o
+./release\passiveability.o
 ./release\qrc_qml.o
 ./release\moc_backend.o
 ./release\moc_map.o

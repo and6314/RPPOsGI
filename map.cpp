@@ -16,25 +16,39 @@ Map::Map(QQuickItem *parent) :
     attackTypes.append(AttackType(6,"Клыки",":/images/attacks/fangs.png",35,1,60));
     attackTypes.append(AttackType(7,"Кинжал",":/images/attacks/dagger.png",15,1,50));
     attackTypes.append(AttackType(8,"Нож",":/images/attacks/dagger-thrown.png",15,2,30));
+    passiveAbilities.append(PassiveAbility(0,"Воодушевление",Ally,10,3,Inspiration));
+    passiveAbilities.append(PassiveAbility(1,"Слабое воодушевление",Ally,5,2,Inspiration));
+    passiveAbilities.append(PassiveAbility(2,"Деморализация",Foe,10,3,Demoralization));
+    passiveAbilities.append(PassiveAbility(3,"Слабая деморализация",Foe,5,2,Demoralization));
+    passiveAbilities.append(PassiveAbility(4,"Лечение",Ally,10,3,Hill));
+    passiveAbilities.append(PassiveAbility(5,"Отравление окружающих",Foe,10,3,Poison));
     this->unittypes.append(UnitType(0,Tzinch_cult,"Культист","мясо", ":/images/units/111.png",
                                     100,2,2,50,5,4,1,10));
     unittypes[0].attacks.append(attackTypes[0]);
     this->unittypes.append(UnitType(1,Tzinch_cult,"Колдун","командир", ":/images/units/112.png",
                                     500,4,3,50,25,44,3,99999));
     unittypes[1].specialfeatures.append("lord");
+    unittypes[1].passiveAbilities.append(passiveAbilities[2]);
+    unittypes[1].passiveAbilities.append(passiveAbilities[1]);
+    unittypes[1].passiveAbilities.append(passiveAbilities[5]);
     unittypes[1].attacks.append(attackTypes[2]);unittypes[1].attacks.append(attackTypes[5]);
     this->unittypes.append(UnitType(2,O_Hereticus,"Инквизитор","командир", ":/images/units/113.png",
                                     500,4,3,50,25,44,3,99999));
     unittypes[2].specialfeatures.append("lord");
+    unittypes[2].passiveAbilities.append(passiveAbilities[0]);
+    unittypes[2].passiveAbilities.append(passiveAbilities[3]);
+    unittypes[2].passiveAbilities.append(passiveAbilities[4]);
     unittypes[2].attacks.append(attackTypes[3]);unittypes[2].attacks.append(attackTypes[4]);
     this->unittypes.append(UnitType(3,O_Hereticus,"Ополченец","легкая пехота", ":/images/units/114.png",
                                     180,2,2,50,5,4,1,15));
     unittypes[3].attacks.append(attackTypes[0]);
     this->unittypes.append(UnitType(4,O_Hereticus,"Лучник","стрелок", ":/images/units/116.png",
                                     100,2,2,50,5,4,3,30));
+    unittypes[4].passiveAbilities.append(passiveAbilities[1]);
     unittypes[4].attacks.append(attackTypes[1]);unittypes[4].attacks.append(attackTypes[7]);
     this->unittypes.append(UnitType(5,Tzinch_cult,"мутант","рубака", ":/images/units/115.png",
                                     250,2,3,50,8,6,1,30));
+    unittypes[5].passiveAbilities.append(passiveAbilities[3]);
     unittypes[5].attacks.append(attackTypes[6]);unittypes[5].attacks.append(attackTypes[8]);
     /*UnitType(int type_id,Fraction f, QString name, QString descr, QString imS,
          double n_hp, int n_ap, double n_mp, double n_mor, double off,
@@ -208,7 +222,7 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
 void Map::newturn()
 {
     ++turnNum;
-    //qDebug()<<activePlayer->baseIncome;
+    passiveAbilitiesAction();
     activePlayer->cash += activePlayer->baseIncome + activePlayer->villages * 5 - activePlayer->units;
     for (int i=0;i<units.length();++i)
     {
@@ -540,6 +554,52 @@ Village * Map::villageUnCell(QPoint cell)
             return &villages[i];
     }
     return NULL;
+}
+
+QList <QPoint> Map::sortByDistance(QList <QPoint> l, QPoint p)
+{
+    for (int i=0;i<l.length();++i)
+        for(int j=i;j>0 && distance(l[j-1].x(),l[j-1].y(),p.x(),p.y())
+            >distance(l[j].x(),l[j].y(),p.x(),p.y());--j)
+            l.swap(j-1,j);
+    return l;
+}
+
+void Map::passiveAbilitiesAction()
+{
+    for (int i=0;i<units.length();++i)
+        if (units[i].player == activePlayer && units[i].type->passiveAbilities.length()>0)
+        {
+            for (int j=0;j<units[i].type->passiveAbilities.length();++j)
+            {
+                for(int k=0;k<units.length();++k)
+                    if (distance(units[i].getCellx(),units[i].getCelly(),units[k].getCellx(),units[k].getCelly())
+                            <=units[i].type->passiveAbilities[j].abilityRadius)
+                        if (units[i].type->passiveAbilities[j].side==Foe && units[k].player!=units[i].player)
+                        {
+                            if (units[i].type->passiveAbilities[j].abilityType==Demoralization)
+                            {
+                                if(units[k].getMorale()>25)
+                                    units[k].setMorale(units[k].getMorale()-units[i].type->passiveAbilities[j].value);
+                            } else
+                            if (units[i].type->passiveAbilities[j].abilityType==Poison)
+                                if(units[k].getHp()*100/units[k].type->getNorm_hp()>25)
+                                    units[k].setHp(units[k].getHp()-units[i].type->passiveAbilities[j].value);
+                        } else
+                            if (units[i].type->passiveAbilities[j].side==Ally && units[k].player==units[i].player)
+                            {
+                                if (units[i].type->passiveAbilities[j].abilityType==Inspiration)
+                                {
+                                    if(units[k].getMorale()<75)
+                                        units[k].setMorale(units[k].getMorale()+units[i].type->passiveAbilities[j].value);
+                                } else
+                                if (units[i].type->passiveAbilities[j].abilityType==Hill)
+                                    if(units[k].getHp()*100/units[k].type->getNorm_hp()<75)
+                                        units[k].setHp(units[k].getHp()+units[i].type->passiveAbilities[j].value);
+                            }
+
+            }
+        }
 }
 
 

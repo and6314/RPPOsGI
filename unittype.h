@@ -3,6 +3,7 @@
 #include <QString>
 #include <QObject>
 #include <attacktype.h>
+#include <passiveability.h>
 
 enum Fraction {O_Hereticus, Tzinch_cult};
 
@@ -15,6 +16,8 @@ public:
              double def, int attackR,int cost);
     Fraction fraction;
     QList<QString> specialfeatures;
+    QList <AttackType> attacks;
+    QList<PassiveAbility> passiveAbilities;
     int cost;
     void setName(QString n);
     QString getName();
@@ -37,7 +40,6 @@ public:
     double getNorm_morale();
     int getAttackRadius();
     bool operator==(const UnitType& arg);
-    QList <AttackType> attacks;
     int getDamage();
 
 private:

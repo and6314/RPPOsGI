@@ -124,7 +124,7 @@ void AI::movements()
     {
         if (m_units[j].type->specialfeatures.contains("lord"))
             continue;
-        vils = sortByDistance(vils,QPoint(m_units[j].getCellx(),m_units[j].getCelly()));
+        vils = map->sortByDistance(vils,QPoint(m_units[j].getCellx(),m_units[j].getCelly()));
         if ((map->activePlayer->villages<=2
              || map->activePlayer->cash<20
              || map->activePlayer->baseIncome+map->activePlayer->villages*5 - map->activePlayer->units < 5
@@ -142,13 +142,13 @@ void AI::movements()
                     }
         } else
         {
-            enems=sortByDistance(enems,QPoint(m_units[j].getCellx(),m_units[j].getCelly()));
+            enems=map->sortByDistance(enems,QPoint(m_units[j].getCellx(),m_units[j].getCelly()));
             for (int i=0;i<enems.length();++i)
             {
                 Unit u=*map->unitOnCell(enems[i].x(),enems[i].y());
                 QList <QPoint> t = freeCellsNearby(enems[i].x(),enems[i].y(),m_units[j].type->getAttackRadius());
 
-                t = sortByDistance(t,QPoint(u.getCellx(),u.getCelly()));
+                t = map->sortByDistance(t,QPoint(u.getCellx(),u.getCelly()));
 
                 if (!targetEnemies.contains(map->units.indexOf(u)))
                 {
@@ -185,7 +185,7 @@ void AI::attacks()
             if (friendsNearby(&map->units[map->units.indexOf(enemyunits[i])],2)<8)
                 enems.append(QPoint(enemyunits[i].getCellx(),enemyunits[i].getCelly()));
         }
-        enems=sortByDistance(enems,QPoint(m_units[i].getCellx(),m_units[i].getCelly()));
+        enems=map->sortByDistance(enems,QPoint(m_units[i].getCellx(),m_units[i].getCelly()));
         Unit *target = map->unitOnCell(enems[0].x(),enems[0].y());
         if (m_units[i].isAttackPossible(target))
         {
@@ -311,10 +311,8 @@ void AI::moveInDirection(Unit *u, QPoint p)
     {tempTarget=p;}
     else
     {
-        //qDebug()<<p<<QPoint(u->getCellx(),u->getCelly());
         QList<QPoint> pth = map->path(p,QPoint(u->getCellx(),u->getCelly()));
-        //qDebug()<<pth<<u->getCellx()<<u->getCelly();
-        pth = sortByDistance(pth,QPoint(u->getCellx(),u->getCelly()));
+        pth = map->sortByDistance(pth,QPoint(u->getCellx(),u->getCelly()));
         for (int i=pth.length()-1;i>=0;--i)
         {
             int r =qFloor(map->distance(pth[i].x(),pth[i].y(),u->getCellx(),u->getCelly()));
@@ -330,7 +328,7 @@ void AI::moveInDirection(Unit *u, QPoint p)
                     while (tempTarget.isNull())
                     {
                         QList<QPoint> places = freeCellsNearby(pth[i].x(),pth[i].y(),k);
-                        places=sortByDistance(places,pth[i]);
+                        places=map->sortByDistance(places,pth[i]);
                         if (!places.isEmpty())
                             tempTarget = places[0];
                         else
@@ -352,14 +350,6 @@ void AI::moveInDirection(Unit *u, QPoint p)
         }
     }
     u->move(map->getMapArr(),map->occupancy,tempTarget.x(),tempTarget.y());
-    //qDebug()<<u1->getCellx()<<u1->getCelly()<<u->getCellx()<<u->getCelly();
 }
 
-QList <QPoint> AI::sortByDistance(QList <QPoint> l, QPoint p)
-{
-    for (int i=0;i<l.length();++i)
-        for(int j=i;j>0 && map->distance(l[j-1].x(),l[j-1].y(),p.x(),p.y())
-            >map->distance(l[j].x(),l[j].y(),p.x(),p.y());--j)
-            l.swap(j-1,j);
-    return l;
-}
+

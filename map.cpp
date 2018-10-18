@@ -208,7 +208,8 @@ void Map::mouseClicked(int x, int y, Qt::MouseButtons btn)
 void Map::newturn()
 {
     ++turnNum;
-    activePlayer->cash += 10 + activePlayer->villages * 5 - activePlayer->units;
+    //qDebug()<<activePlayer->baseIncome;
+    activePlayer->cash += activePlayer->baseIncome + activePlayer->villages * 5 - activePlayer->units;
     for (int i=0;i<units.length();++i)
     {
         if (units[i].player == activePlayer)
@@ -306,7 +307,7 @@ void Map::readMap(QString filename)
     sizeX = s.at(0).toInt(&ok,10);
     sizeY = s.at(1).toInt(&ok,10);
     int **arr = new int *[s.at(0).toInt(&ok,10)];
-    occupancy = new bool *[s.at(0).toInt(&ok,10)];
+    occupancy = new bool *[s.at(1).toInt(&ok,10)];
     for (int i =0; i< s.at(0).toInt(&ok,10); ++i)
     {
         arr[i] = new int[s.at(1).toInt(&ok,10)];
@@ -316,7 +317,7 @@ void Map::readMap(QString filename)
     {
         for (int j=0;j< sizeY;++j)
         {
-            arr[i][j] = s.at(2 + i*sizeX + j).toInt(&ok,10);
+            arr[i][j] = s.at(2 + j*sizeX + i).toInt(&ok,10);
             occupancy[i][j] = false;
             if (arr[i][j] == 5)
             {
@@ -326,6 +327,7 @@ void Map::readMap(QString filename)
     }
     mapArr = arr;
     file1.close();
+
 }
 
 void Map::clear()

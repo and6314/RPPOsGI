@@ -152,11 +152,12 @@ bool Unit::attack(Unit *target)
     for (int i=0;i<type->attacks.length();++i)
         if (isAttackPossible(target,type->attacks[i]))
             availableAttacks.append(type->attacks[i]);
-    while (this->ap!=0)
+    while (this->ap>0)
     {
         if (attack(target,availableAttacks[0]))
             return true;
     }
+    return false;
 }
 
 bool Unit::attack(Unit *target, AttackType atc)

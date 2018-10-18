@@ -44,7 +44,7 @@ bool AI::isRecruitmentNeeded()
 {
     if (m_units.length()<=4 || map->activePlayer->villages<=3)
         return true;
-    if ((map->activePlayer->cash>150  && (10+map->activePlayer->villages*5 - map->activePlayer->units > 10))
+    if ((map->activePlayer->cash>150  && (map->activePlayer->baseIncome+map->activePlayer->villages*5 - map->activePlayer->units > 10))
             || enemiesNearby(getLord(),6) > 1)
         return true;
     return false;
@@ -127,7 +127,7 @@ void AI::movements()
         vils = sortByDistance(vils,QPoint(m_units[j].getCellx(),m_units[j].getCelly()));
         if ((map->activePlayer->villages<=2
              || map->activePlayer->cash<20
-             || 10+map->activePlayer->villages*5 - map->activePlayer->units < 5
+             || map->activePlayer->baseIncome+map->activePlayer->villages*5 - map->activePlayer->units < 5
              || targetVillages.length() < m_units.length()/8+1)
              && vils.length()>0 && m_units[j].type->getNorm_mp()>=mediumSpeed)
         {

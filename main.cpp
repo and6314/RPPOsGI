@@ -7,6 +7,7 @@
 #include "rightpanel.h"
 #include "game.h"
 #include "attackpanel.h"
+#include "menu.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<TopPanel>("toppanel", 1, 0, "TopPanel");
     qmlRegisterType<RightPanel>("rightpanel", 1, 0, "RightPanel");
     qmlRegisterType<AttackPanel>("attackpanel", 1, 0, "AttackPanel");
+    qmlRegisterType<Menu>("menu", 1, 0, "Menu");
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 

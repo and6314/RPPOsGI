@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     rightpanel.cpp \
     ai.cpp \
     attacktype.cpp \
-    attackpanel.cpp
+    attackpanel.cpp \
+    menu.cpp
 
 RESOURCES += qml.qrc
 
@@ -57,4 +58,5 @@ HEADERS += \
     rightpanel.h \
     ai.h \
     attacktype.h \
-    attackpanel.h
+    attackpanel.h \
+    menu.h

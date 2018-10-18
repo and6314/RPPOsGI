@@ -4,7 +4,7 @@ Player::Player()
 {
 
 }
-Player::Player(int id, Fraction f,Person p, QColor col, QString flagsource)
+Player::Player(int id, Fraction f,Person p, QColor col, QString flagsource,int bi)
 {
     fraction = f;
     this->id = id;
@@ -14,6 +14,7 @@ Player::Player(int id, Fraction f,Person p, QColor col, QString flagsource)
     villages = 0;
     units = 0;
     flag = QPixmap(flagsource);
+    baseIncome = bi;
 }
 
 int Player::getid()

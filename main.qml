@@ -8,6 +8,7 @@ import toppanel 1.0
 import rightpanel 1.0
 import game 1.0
 import attackpanel 1.0
+import menu 1.0
 
 ApplicationWindow {
     id: root
@@ -15,20 +16,55 @@ ApplicationWindow {
     height: 800
     visible: true
     color: "#000033"
+
+    MenuScreen{
+        id : menuScreen
+        visible: true;
+        MyButton {
+            id : begin
+            onClicked:
+            {
+                game.newGame()
+                gamearea.visible = true
+                maparea.contentWidth  = (map.sizeX+1) * 64
+                maparea.contentHeight = (map.sizeY+1) *64
+                menuScreen.visible = false
+
+                turnButton.visible = true
+                topPanel.visible = true
+                rightPanel.visible = true
+
+            }
+            x : 1050
+            y:650
+            width:300
+            Text {
+
+                color: "white"
+                font.family: "Helvetica"
+                font.pointSize: 12
+                text: "Начать"
+                anchors.centerIn: parent
+            }
+
+        }
+    }
+
     Game {
         id: game
         m: map
-        Component.onCompleted:
+        /*Component.onCompleted:
         {
             newGame()
             gamearea.visible = true
             maparea.contentWidth  = (map.sizeX+1) * 64
             maparea.contentHeight = (map.sizeY+1) * 64
-        }
+        }*/
     }
 
     MyButton {
         id : turnButton
+        visible: false
         onClicked:
         {
             map.newturn()
@@ -50,6 +86,7 @@ ApplicationWindow {
     }
     TopPanel {
         id:topPanel
+        visible: false
         x:5
         y:5
         height: 30
@@ -59,6 +96,7 @@ ApplicationWindow {
     }
     RightPanel {
         id: rightPanel
+        visible: false
         x :1050
         y:5
         width : 300

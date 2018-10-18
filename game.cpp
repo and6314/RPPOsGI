@@ -63,13 +63,10 @@ void Game::newGame()
         QString flag = mn->pf4 == "Cult"?":/images/flags/chaosflag.png":":/images/flags/incflag.png";
         m->players.append(Player(3,f,Comp,QColor(0,255,255),flag,mn->bi4.toInt(&ok,10)));
     }
-    //m->players.append(Player(0,Tzinch_cult,Man,QColor(255,0,0),":/images/flags/chaosflag.png"));
-    //m->players.append(Player(1,O_Hereticus,Comp,QColor(0,0,255),":/images/flags/incflag.png"));
     m->distributePlayers();
     m->gameInProgress = true;
     m->update();
     ai.setMap(m);
-    //connect(m,SIGNAL(Map::aiturn()),ai,SLOT(AI::doTurn()));
 
 }
 

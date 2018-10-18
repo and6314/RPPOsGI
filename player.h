@@ -12,7 +12,7 @@ class Player
 {
 public:
     Player();
-    Player(int id,Fraction f,Person p,QColor col, QString flagsource);
+    Player(int id,Fraction f,Person p,QColor col, QString flagsource,int bi);
     Fraction fraction;
     int getid();
     QColor color;
@@ -22,6 +22,7 @@ public:
     QPixmap flag;
     bool operator==(const Player& arg);
     Person person;
+    int baseIncome;
 
 private:
     int id;

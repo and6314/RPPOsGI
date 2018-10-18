@@ -30,5 +30,6 @@
         <file>images/attacks/fangs.png</file>
         <file>images/attacks/dagger.png</file>
         <file>images/attacks/dagger-thrown.png</file>
+        <file>MenuScreen.qml</file>
     </qresource>
 </RCC>

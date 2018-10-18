@@ -51,7 +51,8 @@ Item {
             onClicked:
             {
                 defeatScreen.visible = false
-                game.newGame()
+                menuScreen.visible = true
+                /*game.newGame()
                 gamearea.visible = true
                 rightPanel.visible = true
                 topPanel.visible = true
@@ -59,7 +60,7 @@ Item {
                 map.update()
                 rightPanel.update()
                 topPanel.update()
-                rightPanel.update()
+                rightPanel.update()*/
             }
         }
     }

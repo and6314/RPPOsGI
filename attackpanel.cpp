@@ -97,6 +97,8 @@ void AttackPanel::acceptr()
                 Player p = *target->player;
                 m->units.removeOne(*target);
                 m->players.removeOne(p);
+                if (m->players.length()==1)
+                    m->aiVictory();
             }
             else
                 m->units.removeOne(*target);

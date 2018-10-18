@@ -61,7 +61,7 @@ void Game::newGame()
     {
         Fraction f = mn->pf4 == "Cult"?Tzinch_cult:O_Hereticus;
         QString flag = mn->pf4 == "Cult"?":/images/flags/chaosflag.png":":/images/flags/incflag.png";
-        m->players.append(Player(3,f,Comp,QColor(0,255,255),flag,mn->bi4.toInt(&ok,10)));
+        m->players.append(Player(3,f,Man,QColor(0,255,255),flag,mn->bi4.toInt(&ok,10)));
     }
     m->distributePlayers();
     m->gameInProgress = true;

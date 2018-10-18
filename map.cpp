@@ -269,7 +269,8 @@ void Map::newturn()
     if (activePlayer->person == Comp)
     {
         emit aiturn();
-        newturn();
+        if (players.length()>1)
+            newturn();
     }
 
     this->update();
@@ -363,7 +364,6 @@ void Map::clear()
 
 QList <QPoint> Map::path(QPoint cell1,QPoint cell2)
 {
-    qDebug();
     QList <QPoint> path;
     QPoint p1 = QPoint(cell1.x()*64+32,cell1.y()*64+32);
     QPoint p2 = QPoint(cell2.x()*64+32,cell2.y()*64+32);
@@ -388,6 +388,7 @@ QList <QPoint> Map::path(QPoint cell1,QPoint cell2)
 
 void Map::aiVictory()
 {
+
     emit defeat();
 }
 

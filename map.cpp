@@ -253,7 +253,10 @@ void Map::newturn()
         }
     }
     if (activePlayer->person == Comp)
+    {
         emit aiturn();
+        newturn();
+    }
 
     this->update();
 
